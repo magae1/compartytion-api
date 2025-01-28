@@ -1,0 +1,13 @@
+package com.compartytion;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CompartytionApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(CompartytionApplication.class, args);
+  }
+
+}
