@@ -14,14 +14,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-  
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .httpBasic(HttpBasicConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-            .anyRequest().denyAll());
+            .anyRequest().authenticated());
     return http.build();
   }
 
