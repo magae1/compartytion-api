@@ -1,0 +1,24 @@
+name: compartytion-dev-storage
+
+volumes:
+  postgres-data:
+  redis-data:
+
+services:
+  postgresql:
+    image: postgres:17.2-alpine3.21
+    environment:
+      - POSTGRES_DB=compartytion
+      - POSTGRES_PASSWORD=com-password
+      - POSTGRES_USER=com-dev-user
+    ports:
+      - "5500:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+  
+  redis:
+    image: redis:7.4.1-alpine3.20
+    ports:
+      - "5501:6379"
+    volumes:
+      - redis-data:/data
