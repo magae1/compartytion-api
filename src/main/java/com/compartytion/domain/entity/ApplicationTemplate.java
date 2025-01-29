@@ -1,4 +1,4 @@
-package com.compartytion.user.entity;
+package com.compartytion.domain.entity;
 
 
 import jakarta.persistence.Column;
@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -22,7 +21,6 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @Builder
-@ToString(exclude = "account")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ApplicationTemplate {

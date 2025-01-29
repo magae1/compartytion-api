@@ -1,9 +1,9 @@
-package com.compartytion.user.repository;
+package com.compartytion.domain.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.compartytion.user.entity.Account;
+import com.compartytion.domain.entity.Account;
 
 
 @Repository

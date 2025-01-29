@@ -1,9 +1,10 @@
-package com.compartytion.user.entity;
+package com.compartytion.domain.entity;
 
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,14 +16,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 
 @Entity
 @Getter
 @Builder
-@ToString(exclude = "applicationTemplates")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
@@ -34,9 +33,10 @@ public class Account {
   @Column(nullable = false, unique = true)
   private String email;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String username;
 
+  @JsonIgnore // 직렬화 제외
   @Column(nullable = false)
   private String password;
 
