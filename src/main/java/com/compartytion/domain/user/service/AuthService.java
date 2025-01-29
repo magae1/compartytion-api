@@ -8,20 +8,29 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.compartytion.domain.entity.Account;
+import com.compartytion.domain.model.ForgivenPassword;
 import com.compartytion.domain.model.UnauthenticatedEmail;
+import com.compartytion.domain.model.entity.Account;
+import com.compartytion.domain.repository.AccountRepository;
+import com.compartytion.domain.repository.ForgivenPasswordRepository;
+import com.compartytion.domain.repository.UnauthenticatedEmailRepository;
 import com.compartytion.domain.user.dto.EmailExistenceResponse;
+import com.compartytion.domain.user.dto.EmailOTPRequest;
+import com.compartytion.domain.user.dto.EmailOTPResponse;
+import com.compartytion.domain.user.dto.PasswordChangeRequest;
 import com.compartytion.domain.user.dto.SignUpRequest;
 import com.compartytion.domain.user.mapper.AccountMapper;
-import com.compartytion.domain.user.repository.AccountRepository;
-import com.compartytion.domain.user.repository.UnauthenticatedEmailRepository;
 import com.compartytion.domain.user.utils.OTPGenerator;
 import com.compartytion.global.component.EmailSender;
 
-import static com.compartytion.domain.user.exception.AuthExceptions.DUPLICATED_EMAIL;
-import static com.compartytion.domain.user.exception.AuthExceptions.NOT_FOUND_UNAUTHENTICATED_EMAIL;
-import static com.compartytion.domain.user.exception.AuthExceptions.NOT_MATCHED_PASSWORD;
-import static com.compartytion.domain.user.exception.AuthExceptions.NOT_VERIFIED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthExceptions.ALREADY_VERIFIED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthExceptions.DUPLICATED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_EMAIL;
+import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_FORGIVEN_PASSWORD;
+import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_UNAUTHENTICATED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthExceptions.NOT_MATCHED_PASSWORD;
+import static com.compartytion.domain.user.enums.AuthExceptions.NOT_VERIFIED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthExceptions.WRONG_OTP;
 
 
 @Log4j2
@@ -31,62 +40,204 @@ public class AuthService {
 
   private final AccountRepository accountRepo;
   private final UnauthenticatedEmailRepository unauthenticatedEmailRepo;
+  private final ForgivenPasswordRepository forgivenPasswordRepo;
   private final EmailSender emailSender;
   private final PasswordEncoder passwordEncoder;
 
-  @Value("${otp.expire-interval}")
-  private Long otpExpireInterval;
+  @Value("${otp.ttl}")
+  private long otpTtl;
 
 
   private boolean existsByEmail(String email) {
     return accountRepo.existsByEmail(email);
   }
 
+  private void insertUnauthenticatedEmail(String email, String otp) {
+    unauthenticatedEmailRepo.save(UnauthenticatedEmail.builder()
+        .email(email)
+        .otp(otp)
+        .ttl(otpTtl)
+        .build());
+  }
+
+  private void insertForgivenPassword(String email, String otp) {
+    forgivenPasswordRepo.save(ForgivenPassword.builder()
+        .email(email)
+        .otp(otp)
+        .ttl(otpTtl)
+        .build());
+  }
+
+  private void updateUnauthenticatedEmailVerified(String email) {
+    unauthenticatedEmailRepo.save(UnauthenticatedEmail.builder()
+        .email(email)
+        .isVerified(true)
+        .ttl(otpTtl * 100)
+        .build()
+    );
+  }
+
+  private void updateForgivenPasswordVerified(String email) {
+    forgivenPasswordRepo.save(ForgivenPassword.builder()
+        .email(email)
+        .isVerified(true)
+        .ttl(otpTtl * 100)
+        .build());
+  }
+
+  private void sendOTPByEmail(String email, String otp) {
+    emailSender.sendMail(email, "인증을 위한 OTP를 보내드립니다.", otp);
+  }
+
+  /**
+   * 이메일 존재 여부를 확인합니다.
+   *
+   * @param email 존재하는지 확인할 이메일
+   * @return {@link com.compartytion.domain.user.dto.EmailExistenceResponse}
+   */
   public EmailExistenceResponse checkEmailExistence(String email) {
     boolean exists = existsByEmail(email);
     return new EmailExistenceResponse(email, exists);
   }
 
-  public void sendOTPByEmail(String email) throws ResponseStatusException {
+  /**
+   * 회원가입을 위한 OTP를 전송합니다.
+   *
+   * @param email OTP를 수신할 이메일
+   * @return {@link com.compartytion.domain.user.dto.EmailOTPResponse}
+   * @throws ResponseStatusException OTP 전송 실패 시 발생
+   */
+  public EmailOTPResponse sendOTPForSignup(String email) throws ResponseStatusException {
     if (existsByEmail(email)) {
       throw DUPLICATED_EMAIL.toResponseStatusException();
     }
     log.info("Email {} accepted!", email);
 
     String otp = OTPGenerator.generateOTP();
-    unauthenticatedEmailRepo.save(UnauthenticatedEmail.builder()
-        .email(email)
-        .otp(otp)
-        .expiration(otpExpireInterval)
-        .build());
-    emailSender.sendMail(email, "OTP", otp);
+    insertUnauthenticatedEmail(email, otp);
+    sendOTPByEmail(email, otp);
+    return new EmailOTPResponse(email, otpTtl);
   }
 
-  public void signUp(SignUpRequest signUpRequest) throws ResponseStatusException {
-    String requestedEmail = signUpRequest.email();
+  /**
+   * 회원가입을 위한 OTP 인증을 시도합니다.
+   *
+   * @param request {@link com.compartytion.domain.user.dto.EmailOTPRequest}
+   * @throws ResponseStatusException OTP 인증 실패 시 발생
+   */
+  public void verifyOTPForSignup(EmailOTPRequest request) throws ResponseStatusException {
+    UnauthenticatedEmail unauthenticatedEmail = unauthenticatedEmailRepo.findById(request.email())
+        .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toResponseStatusException);
 
-    UnauthenticatedEmail unauthenticatedEmail = unauthenticatedEmailRepo.findById(requestedEmail)
+    if (unauthenticatedEmail.isVerified()) {
+      throw ALREADY_VERIFIED_EMAIL.toResponseStatusException();
+    }
+
+    if (!unauthenticatedEmail.getOtp().equals(request.otp())) {
+      throw WRONG_OTP.toResponseStatusException();
+    }
+
+    updateUnauthenticatedEmailVerified(request.email());
+  }
+
+  /**
+   * 비밀번호 변경을 위한 OTP를 전송합니다.
+   *
+   * @param email OTP를 수신할 이메일
+   * @return {@link com.compartytion.domain.user.dto.EmailOTPResponse}
+   * @throws ResponseStatusException OTP 발송 실패 시 발생
+   */
+  public EmailOTPResponse sendOTPForChangePassword(String email) throws ResponseStatusException {
+    if (!existsByEmail(email)) {
+      throw NOT_FOUND_EMAIL.toResponseStatusException();
+    }
+
+    String otp = OTPGenerator.generateOTP();
+    insertForgivenPassword(email, otp);
+    sendOTPByEmail(email, otp);
+    return new EmailOTPResponse(email, otpTtl);
+  }
+
+  /**
+   * 비밀번호 변경을 위한 OTP 인증을 시도합니다.
+   *
+   * @param request {@link com.compartytion.domain.user.dto.EmailOTPRequest}
+   * @throws ResponseStatusException 인증 실패 시 발생
+   */
+  public void verifyOTPForChangePassword(EmailOTPRequest request) throws ResponseStatusException {
+    ForgivenPassword forgivenPassword = forgivenPasswordRepo.findById(request.email())
+        .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toResponseStatusException);
+
+    if (forgivenPassword.isVerified()) {
+      throw ALREADY_VERIFIED_EMAIL.toResponseStatusException();
+    }
+
+    if (!forgivenPassword.getOtp().equals(request.otp())) {
+      throw WRONG_OTP.toResponseStatusException();
+    }
+
+    updateForgivenPasswordVerified(request.email());
+  }
+
+  /**
+   * 비밀번호 변경을 시도합니다.
+   *
+   * @param email   비밀번호를 변경하고자 하는 계정의 이메일
+   * @param request {@link com.compartytion.domain.user.dto.PasswordChangeRequest}
+   * @throws ResponseStatusException 비밀번호 변경 실패 시 발생
+   */
+  public void changePassword(String email, PasswordChangeRequest request)
+      throws ResponseStatusException {
+    String newPassword = request.newPassword();
+    String newConfirmedPassword = request.newConfirmedPassword();
+
+    if (!newPassword.equals(newConfirmedPassword)) {
+      throw NOT_MATCHED_PASSWORD.toResponseStatusException();
+    }
+
+    ForgivenPassword forgivenPassword = forgivenPasswordRepo.findById(email)
+        .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toResponseStatusException);
+
+    if (!forgivenPassword.isVerified()) {
+      throw NOT_VERIFIED_EMAIL.toResponseStatusException();
+    }
+
+    Account account = accountRepo.findByEmail(email)
+        .orElseThrow(NOT_FOUND_EMAIL::toResponseStatusException);
+    account.changePassword(newPassword, passwordEncoder);
+    accountRepo.save(account);
+  }
+
+  /**
+   * 회원가입을 시도합니다.
+   *
+   * @param request {@link com.compartytion.domain.user.dto.SignUpRequest}
+   * @throws ResponseStatusException 회원가입 실패 시 발생
+   */
+  public void signUp(SignUpRequest request) throws ResponseStatusException {
+    String password = request.password();
+    String confirmedPassword = request.confirmedPassword();
+    if (!password.equals(confirmedPassword)) {
+      throw NOT_MATCHED_PASSWORD.toResponseStatusException();
+    }
+
+    UnauthenticatedEmail unauthenticatedEmail = unauthenticatedEmailRepo.findById(request.email())
         .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toResponseStatusException);
 
     if (!unauthenticatedEmail.isVerified()) {
       throw NOT_VERIFIED_EMAIL.toResponseStatusException();
     }
 
-    if (existsByEmail(requestedEmail)) {
-      unauthenticatedEmailRepo.delete(unauthenticatedEmail);
+    if (existsByEmail(request.email())) {
+      unauthenticatedEmailRepo.deleteById(request.email());
       throw DUPLICATED_EMAIL.toResponseStatusException();
     }
 
-    String password = signUpRequest.password();
-    String confirmedPassword = signUpRequest.confirmedPassword();
-    if (!password.equals(confirmedPassword)) {
-      throw NOT_MATCHED_PASSWORD.toResponseStatusException();
-    }
-
-    log.info("Sign up with email {}", requestedEmail);
+    log.info("Sign up with email {}", request.email());
     String encryptedPassword = passwordEncoder.encode(password);
-    Account account = AccountMapper.toEntity(signUpRequest, encryptedPassword);
+    Account account = AccountMapper.toEntity(request, encryptedPassword);
     accountRepo.save(account);
+    unauthenticatedEmailRepo.deleteById(request.email());
   }
 
 }

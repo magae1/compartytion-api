@@ -1,4 +1,4 @@
-package com.compartytion.domain.entity;
+package com.compartytion.domain.model.entity;
 
 
 import java.time.LocalDateTime;
@@ -16,7 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Entity
@@ -40,11 +41,11 @@ public class Account {
   @Column(nullable = false)
   private String password;
 
-  @CreatedDate
+  @CreationTimestamp
   @Column(updatable = false, nullable = false)
   private LocalDateTime createdAt;
 
-  @CreatedDate
+  @CreationTimestamp
   @Column(nullable = false)
   private LocalDateTime lastPasswordChangedAt;
 
@@ -53,4 +54,9 @@ public class Account {
   @OneToMany(mappedBy = "account")
   private List<ApplicationTemplate> applicationTemplates;
 
+
+  public void changePassword(String newPassword, PasswordEncoder passwordEncoder) {
+    this.password = passwordEncoder.encode(newPassword);
+    this.lastPasswordChangedAt = LocalDateTime.now();
+  }
 }

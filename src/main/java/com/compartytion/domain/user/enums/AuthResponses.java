@@ -1,4 +1,4 @@
-package com.compartytion.domain.user.exception;
+package com.compartytion.domain.user.enums;
 
 
 import lombok.Getter;
@@ -14,13 +14,14 @@ import com.compartytion.global.dto.ActionResponse;
 @ToString
 @RequiredArgsConstructor
 public enum AuthResponses {
-  OTP_SENT(HttpStatus.OK, "OTP가 전송됐습니다."),
+  EMAIL_VERIFIED(HttpStatus.OK, "이메일이 확인됐습니다."),
+  PASSWORD_CHANGED(HttpStatus.OK, "비밀번호가 변경됐습니다."),
   SIGN_UP_COMPLETED(HttpStatus.CREATED, "회원가입이 완료됐습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;
 
   public ResponseEntity<ActionResponse> toActionResponseEntity() {
-    return new ResponseEntity<>(new ActionResponse(message), httpStatus);
+    return new ResponseEntity<>(new ActionResponse(message, httpStatus.value()), httpStatus);
   }
 }

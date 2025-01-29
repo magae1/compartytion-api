@@ -12,8 +12,8 @@ import org.springframework.data.redis.core.TimeToLive;
 @Builder
 @Getter
 @AllArgsConstructor
-@RedisHash("unauthenticated-email")
-public class UnauthenticatedEmail {
+@RedisHash("forgiven-password")
+public class ForgivenPassword {
 
   @Id
   private String email;

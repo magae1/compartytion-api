@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.compartytion.domain.user.dto.EmailExistenceResponse;
-import com.compartytion.domain.user.repository.AccountRepository;
-import com.compartytion.domain.user.repository.UnauthenticatedEmailRepository;
+import com.compartytion.domain.repository.AccountRepository;
+import com.compartytion.domain.repository.UnauthenticatedEmailRepository;
 import com.compartytion.global.component.EmailSender;
 
 
@@ -70,7 +70,7 @@ public class AuthServiceTests {
 
   @Test
   @DisplayName("특정 이메일을 가진 유저 정보가 있으면, 예외를 반환")
-  void givenAccount_whenSendOTPByEmail_thenThrowsResponseStatusException() throws Exception {
+  void givenAccount_whenSendOTPForSignup_thenThrowsResponseStatusException() throws Exception {
     // Given
     String email = "test@example.com";
     when(accountRepo.existsByEmail(email)).thenReturn(true);
@@ -78,13 +78,13 @@ public class AuthServiceTests {
     // Then
     assertThrows(ResponseStatusException.class, () -> {
       // When
-      authService.sendOTPByEmail(email);
+      authService.sendOTPForSignup(email);
     });
   }
 
   @Test
   @DisplayName("특정 이메일을 가진 유저 정보가 없으면, 예외를 반환하지 않음")
-  void givenAccount_whenSendOTPByEmail_thenNotThrowException() throws Exception {
+  void givenAccount_whenSendOTPForSignup_thenNotThrowException() throws Exception {
     // Given
     String email = "test@example.com";
     when(accountRepo.existsByEmail(email)).thenReturn(false);
@@ -92,7 +92,7 @@ public class AuthServiceTests {
     // Then
     assertDoesNotThrow(() -> {
       // When
-      authService.sendOTPByEmail(email);
+      authService.sendOTPForSignup(email);
     });
   }
 

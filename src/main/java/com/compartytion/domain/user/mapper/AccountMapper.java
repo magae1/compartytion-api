@@ -1,7 +1,7 @@
 package com.compartytion.domain.user.mapper;
 
 
-import com.compartytion.domain.entity.Account;
+import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.user.dto.SignUpRequest;
 
 

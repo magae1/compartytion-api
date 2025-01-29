@@ -1,4 +1,4 @@
-package com.compartytion.domain.entity;
+package com.compartytion.domain.model.entity;
 
 
 import jakarta.persistence.Column;

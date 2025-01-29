@@ -1,4 +1,4 @@
-package com.compartytion.domain.user.repository;
+package com.compartytion.domain.repository;
 
 
 import org.springframework.data.repository.CrudRepository;
