@@ -1,9 +1,11 @@
 package com.compartytion.global.filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -36,10 +38,12 @@ public class ExceptionHandleFilter extends OncePerRequestFilter {
           "code", HttpStatus.BAD_REQUEST.value()
       ));
 
-      Map<String, Object> message = e.getConstraintViolations()
-          .stream()
-          .collect(Collectors.toMap((violation) -> violation.getPropertyPath().toString(),
-              ConstraintViolation::getMessageTemplate));
+      Map<String, List<String>> message = new HashMap<>();
+      for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
+        message.computeIfAbsent(violation.getPropertyPath().toString(), k -> new ArrayList<>())
+            .add(violation.getMessage());
+      }
+
       body.put("message", message);
       setErrorResponse(response, HttpStatus.BAD_REQUEST, body);
     } catch (Exception e) {

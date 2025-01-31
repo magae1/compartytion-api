@@ -11,7 +11,6 @@ public record LoginRequest(
     @NotBlank(message = "이메일은 반드시 입력해야 합니다.")
     String email,
     @NotBlank(message = "비밀번호는 반드시 입력해야 합니다.")
-    @Size(message = "비밀번호는 최소 8자 이상이어야 합니다.", min = 8, max = 100)
     String password
 ) {
 
