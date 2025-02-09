@@ -2,7 +2,6 @@ package com.compartytion.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class AccountDetailsService implements UserDetailsService {
   private final AccountRepository accountRepo;
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public AccountDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Account account = accountRepo.findByEmail(username)
         .orElseThrow(() -> new UsernameNotFoundException(NOT_FOUND_EMAIL.getMessage()));
     return new AccountDetails(account);

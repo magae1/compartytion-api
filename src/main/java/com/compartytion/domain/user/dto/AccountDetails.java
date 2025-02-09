@@ -4,10 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,18 +13,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.compartytion.domain.model.entity.Account;
 
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = "password")
 public class AccountDetails implements UserDetails {
 
-  private String email;
+  @Getter
+  private final Long id;
+
+  private final String email;
 
   @JsonIgnore
-  private String password;
+  private final String password;
 
 
   public AccountDetails(Account account) {
+    this.id = account.getId();
     this.email = account.getEmail();
     this.password = account.getPassword();
   }

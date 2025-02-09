@@ -1,7 +1,7 @@
 name: Run unit test
 
 on:
-  push:
+  pull_request:
     branches: [ main, develop ]
     paths:
       - 'src/**'

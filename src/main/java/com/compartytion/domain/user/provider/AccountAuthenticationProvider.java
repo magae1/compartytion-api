@@ -6,11 +6,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.compartytion.domain.user.dto.AccountDetails;
+import com.compartytion.domain.user.service.AccountDetailsService;
 import com.compartytion.domain.user.token.AccountAuthenticationToken;
 
 import static com.compartytion.domain.user.enums.AuthExceptions.NOT_MATCHED_PASSWORD;
@@ -20,7 +20,7 @@ import static com.compartytion.domain.user.enums.AuthExceptions.NOT_MATCHED_PASS
 @RequiredArgsConstructor
 public class AccountAuthenticationProvider implements AuthenticationProvider {
 
-  private final UserDetailsService userDetailsService;
+  private final AccountDetailsService accountDetailsService;
   private final PasswordEncoder passwordEncoder;
 
 
@@ -29,13 +29,14 @@ public class AccountAuthenticationProvider implements AuthenticationProvider {
     String email = authentication.getName();
     String password = authentication.getCredentials().toString();
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    AccountDetails accountDetails = accountDetailsService.loadUserByUsername(email);
 
-    if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+    if (!passwordEncoder.matches(password, accountDetails.getPassword())) {
       throw new BadCredentialsException(NOT_MATCHED_PASSWORD.getMessage());
     }
 
-    return new AccountAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+    return new AccountAuthenticationToken(accountDetails, accountDetails.getUsername(),
+        accountDetails.getAuthorities());
   }
 
   @Override
