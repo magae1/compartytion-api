@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
@@ -40,6 +41,9 @@ public class SecurityConfig {
         .addFilterBefore(exceptionHandleFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(accountAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         .httpBasic(HttpBasicConfigurer::disable)
+        .logout(logout -> logout
+            .logoutUrl("/auth/logout")
+            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()))
         .csrf(CsrfConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
