@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -21,9 +22,6 @@ public class EmptyAccountLoader implements CommandLineRunner {
   @Value("${empty-account.email}")
   private String email;
 
-  @Value("${empty-account.username}")
-  private String username;
-
   @Value("${empty-account.password}")
   private String password;
 
@@ -38,9 +36,10 @@ public class EmptyAccountLoader implements CommandLineRunner {
       }
       Account account = Account.builder()
           .email(email)
-          .username(username)
+          .username("탈퇴 계정")
           .password(passwordEncoder.encode(password))
           .build();
+      log.info("Insert base account: {}", account);
       accountRepos.save(account);
     } catch (IllegalArgumentException | OptimisticLockingFailureException e) {
       log.error(e);

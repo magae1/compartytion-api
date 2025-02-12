@@ -1,8 +1,8 @@
 name: Run unit test
 
 on:
-  pull_request:
-    branches: [ main, develop ]
+  push:
+    branches: [ develop ]
     paths:
       - 'src/**'
 
@@ -15,7 +15,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '21.0.6'
           distribution: 'temurin'
           cache: gradle
 
@@ -23,6 +23,8 @@ jobs:
       # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+        with:
+          gradle-version: "8.11.1"
 
       - name: Run Test with Gradle Wrapper
         env:
@@ -30,11 +32,9 @@ jobs:
         run: ./gradlew --info test
 
       - name: Run JaCoCo Test Report
-        if: success()
         run: ./gradlew jacocoTestReport
 
       - name: Generate JaCoCo Badge
-        if: success()
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
         with:
