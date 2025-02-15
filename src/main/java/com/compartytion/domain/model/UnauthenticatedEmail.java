@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.TimeToLive;
 @Builder
 @Getter
 @AllArgsConstructor
-@RedisHash("unauthenticated-email")
+@RedisHash(value = "unauthenticated-email", timeToLive = 1500)
 public class UnauthenticatedEmail {
 
   @Id

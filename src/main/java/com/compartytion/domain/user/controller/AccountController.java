@@ -24,12 +24,14 @@ import com.compartytion.domain.user.service.AccountService;
 @Tag(name = "Account API", description = "계정 관련 API")
 @Log4j2
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/accounts")
 @RequiredArgsConstructor
 public class AccountController {
 
   private final AccountService accountService;
 
+  @Operation(summary = "본인 계정 간단 정보 조회")
+  @GetMapping("/simple/me")
   public ResponseEntity<SimpleAccountResponse> getMySimpleAccount(
       @AuthenticationPrincipal AccountDetails accountDetails
   ) {

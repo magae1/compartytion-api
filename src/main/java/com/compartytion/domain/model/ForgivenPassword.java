@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.TimeToLive;
 @Builder
 @Getter
 @AllArgsConstructor
-@RedisHash("forgiven-password")
+@RedisHash(value = "forgiven-password", timeToLive = 1500)
 public class ForgivenPassword {
 
   @Id
