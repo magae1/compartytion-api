@@ -19,13 +19,15 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
+
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Account {
+public class Account extends CreationTimeStampMixin {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,16 +36,12 @@ public class Account {
   @Column(nullable = false, unique = true)
   private String email;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 150)
   private String username;
 
   @JsonIgnore // 직렬화 제외
   @Column(nullable = false)
   private String password;
-
-  @CreationTimestamp
-  @Column(updatable = false, nullable = false)
-  private LocalDateTime createdAt;
 
   @CreationTimestamp
   @Column(nullable = false)

@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,33 +19,32 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.compartytion.domain.model.mixin.TimeStampMixin;
+import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
 
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"competition_id", "index", "depth"}))
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ApplicationTemplate extends TimeStampMixin {
+public class Rule extends CreationTimeStampMixin {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
+  private Integer index;
+
+  @Column(nullable = false)
+  private Integer depth;
+
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn
   @OnDelete(action = OnDeleteAction.CASCADE)
-  private Account account;
+  private Competition competition;
 
-  @Column(nullable = false, length = 150)
-  private String displayedName;
-
-  @Column(nullable = false, length = 150)
-  private String hiddenName;
-
-  @Column(columnDefinition = "TEXT")
-  private String introduction;
-
+  @Column(nullable = false)
+  private String content;
 }
-

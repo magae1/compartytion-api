@@ -1,7 +1,7 @@
 package com.compartytion.domain.model.entity;
 
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +20,10 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
 
 
 @Entity
@@ -29,7 +31,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Competition {
+public class Competition extends CreationTimeStampMixin {
 
   @ToString
   @RequiredArgsConstructor
@@ -51,7 +53,7 @@ public class Competition {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String introduction;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(optional = false)
   @JoinColumn
   @ColumnDefault("1")
   @OnDelete(action = OnDeleteAction.SET_DEFAULT)
@@ -71,7 +73,13 @@ public class Competition {
   @Column(nullable = false)
   private boolean isPublic;
 
-  @CreationTimestamp
-  @Column(nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+  @OneToMany(mappedBy = "competition")
+  List<Team> teams;
+
+  @OneToMany(mappedBy = "competition")
+  List<Rule> rules;
+
+  @OneToMany(mappedBy = "competition")
+  List<Participant> participants;
+
 }
