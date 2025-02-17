@@ -20,7 +20,7 @@ import com.compartytion.domain.user.dto.EmailOTPResponse;
 import com.compartytion.domain.user.dto.PasswordChangeRequest;
 import com.compartytion.domain.user.dto.SignUpRequest;
 import com.compartytion.domain.user.mapper.AccountMapper;
-import com.compartytion.domain.user.utils.OTPGenerator;
+import com.compartytion.global.component.OTPGenerator;
 import com.compartytion.global.component.EmailSender;
 
 import static com.compartytion.domain.user.enums.AuthExceptions.ALREADY_VERIFIED_EMAIL;
@@ -43,6 +43,7 @@ public class AuthService {
   private final ForgivenPasswordRepository forgivenPasswordRepo;
   private final EmailSender emailSender;
   private final PasswordEncoder passwordEncoder;
+  private final OTPGenerator otpGenerator;
 
   @Value("${otp.ttl}")
   private long otpTtl;
@@ -113,7 +114,7 @@ public class AuthService {
     }
     log.info("Email {} accepted!", email);
 
-    String otp = OTPGenerator.generateOTP();
+    String otp = otpGenerator.next();
     insertUnauthenticatedEmail(email, otp);
     sendOTPByEmail(email, otp);
     return new EmailOTPResponse(email, otpTtl);
@@ -152,7 +153,7 @@ public class AuthService {
       throw NOT_FOUND_EMAIL.toResponseStatusException();
     }
 
-    String otp = OTPGenerator.generateOTP();
+    String otp = otpGenerator.next();
     insertForgivenPassword(email, otp);
     sendOTPByEmail(email, otp);
     return new EmailOTPResponse(email, otpTtl);

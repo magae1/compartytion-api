@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import com.compartytion.domain.user.dto.EmailExistenceResponse;
 import com.compartytion.domain.repository.AccountRepository;
 import com.compartytion.domain.repository.UnauthenticatedEmailRepository;
+import com.compartytion.global.component.OTPGenerator;
 import com.compartytion.global.component.EmailSender;
 
 
@@ -35,6 +36,9 @@ public class AuthServiceTests {
 
   @Mock
   private EmailSender emailSender;
+
+  @Mock
+  private OTPGenerator otpGenerator;
 
   @InjectMocks
   private AuthService authService;
@@ -87,6 +91,7 @@ public class AuthServiceTests {
   void givenAccount_whenSendOTPForSignup_thenNotThrowException() throws Exception {
     // Given
     String email = "test@example.com";
+    when(otpGenerator.next()).thenReturn("123456");
     when(accountRepo.existsByEmail(email)).thenReturn(false);
 
     // Then
