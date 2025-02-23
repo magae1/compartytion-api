@@ -15,7 +15,9 @@ import com.compartytion.global.dto.ActionResponseEntityBuilder;
 @ToString
 @RequiredArgsConstructor
 public enum CompetitionResponses implements ActionResponseEntityBuilder {
-  COMPETITION_CREATED(HttpStatus.OK, "대회가 생성됐습니다.");
+  COMPETITION_CREATED(HttpStatus.CREATED, "대회가 생성됐습니다."),
+  COMPETITION_MODIFIED(HttpStatus.OK, "대회 정보가 변경됐습니다."),
+  COMPETITION_DELETED(HttpStatus.OK, "대회가 삭제됐습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;

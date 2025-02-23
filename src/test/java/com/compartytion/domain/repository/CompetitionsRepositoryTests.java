@@ -6,18 +6,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
+import com.compartytion.domain.competition.mapper.CompetitionMapper;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.model.entity.Competition;
-import com.compartytion.global.component.Snowflake;
+import com.compartytion.domain.model.entity.Competition.Status;
 
 
 @RunWith(SpringRunner.class)
-@Import(Snowflake.class)
 @DataJpaTest
 public class CompetitionsRepositoryTests {
 
@@ -27,14 +28,55 @@ public class CompetitionsRepositoryTests {
   @Autowired
   private AccountRepository accountRepo;
 
-  @Autowired
-  private Snowflake snowflake;
+  @Test
+  @DisplayName("대회 생성 테스트")
+  void givenCreationDTO_whenInsertCompetition_thenEntitySaved() {
+    // Given
+    Account account = Account.builder()
+        .email("test@example.com")
+        .username("test-user")
+        .password("123456")
+        .build();
+    accountRepo.save(account);
+
+    CompetitionCreationDTO creationDTO = CompetitionCreationDTO.builder()
+        .creatorId(account.getId())
+        .title("test competition")
+        .introduction("Hi! It's test competition.")
+        .isPublic(false)
+        .isTeamGame(false)
+        .build();
+
+    // Then
+    assertDoesNotThrow(() -> {
+      // When
+      competitionRepo.save(CompetitionMapper.toEntity(creationDTO));
+    });
+  }
 
   @Test
-  @DisplayName("Snowflake를 이용한 대회 엔티티 삽입")
-  void givenSnowflakeId_whenInsertCompetition_thenEntitySaved() {
+  @DisplayName("잘못된 account_id를 이용한 대회 생성 테스트")
+  void givenWrongAccountIdCreationDTO_whenInsertCompetition_thenThrowException() {
     // Given
-    Long id = snowflake.nextId();
+    CompetitionCreationDTO creationDTO = CompetitionCreationDTO.builder()
+        .creatorId(100L)
+        .title("test competition")
+        .introduction("Hi! It's test competition.")
+        .isPublic(false)
+        .isTeamGame(false)
+        .build();
+
+    // Then
+    assertThrows(RuntimeException.class, () -> {
+      // When
+      competitionRepo.save(CompetitionMapper.toEntity(creationDTO));
+    });
+  }
+
+  @Test
+  @DisplayName("대회 삭제 테스트")
+  void givenCompetitionId_whenDeleteByCompetitionId_thenEntityDeleted() {
+    // Given
     Account account = Account.builder()
         .email("test@example.com")
         .username("test-user")
@@ -42,19 +84,46 @@ public class CompetitionsRepositoryTests {
         .build();
     accountRepo.save(account);
     Competition competition = Competition.builder()
-        .id(id)
         .creator(account)
         .title("test competition")
         .introduction("Hi! It's test competition.")
         .isPublic(false)
         .isTeamGame(false)
         .build();
-
-    // When
-    Competition savedCompetition = competitionRepo.save(competition);
+    competition = competitionRepo.save(competition);
+    Long competitionId = competition.getId();
 
     // Then
-    assertEquals(id, savedCompetition.getId());
+    assertDoesNotThrow(() -> {
+      // When
+      competitionRepo.deleteByCompetitionId(competitionId);
+    });
   }
 
+  @Test
+  @DisplayName("대회 상태 변경 테스트")
+  void givenNewStatus_whenUpdateStatusById_thenCompetitionStatusChanged() {
+    // Given
+    Account account = Account.builder()
+        .email("test@example.com")
+        .username("test-user")
+        .password("123456")
+        .build();
+    accountRepo.save(account);
+    Competition competition = Competition.builder()
+        .creator(account)
+        .title("test competition")
+        .introduction("Hi! It's test competition.")
+        .isPublic(false)
+        .isTeamGame(false)
+        .build();
+    competitionRepo.save(competition);
+    Status status = Status.READY;
+
+    // Then
+    assertDoesNotThrow(() -> {
+      // When
+      competitionRepo.updateStatusById(competition.getId(), status);
+    });
+  }
 }

@@ -6,6 +6,7 @@ import com.compartytion.domain.repository.projection.DetailAccountInfo;
 import com.compartytion.domain.repository.projection.SimpleAccountInfo;
 import com.compartytion.domain.user.dto.DetailAccountResponse;
 import com.compartytion.domain.user.dto.SignUpRequest;
+import com.compartytion.domain.user.dto.SimpleAccountDTO;
 import com.compartytion.domain.user.dto.SimpleAccountResponse;
 
 
@@ -37,4 +38,10 @@ public class AccountMapper {
     );
   }
 
+  public static SimpleAccountDTO toSimpleAccountDTO(Account account) {
+    return SimpleAccountDTO.builder()
+        .username(account.getUsername())
+        .avatar(account.getAvatar())
+        .build();
+  }
 }

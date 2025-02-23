@@ -14,12 +14,9 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CompetitionCreationDTO {
+public class CompetitionStatusChangeDTO {
 
-  private String title;
-  private String introduction;
-  private Boolean isTeamGame;
-  private Boolean isPublic;
-  private Long creatorId;
-
+  private Long competitionId;
+  private Long accountId;
+  private String status;
 }

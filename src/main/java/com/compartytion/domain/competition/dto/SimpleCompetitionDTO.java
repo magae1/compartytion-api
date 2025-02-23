@@ -8,18 +8,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import com.compartytion.domain.model.entity.Competition;
+import com.compartytion.domain.user.dto.SimpleAccountDTO;
+
 
 @Getter
 @Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CompetitionCreationDTO {
+public class SimpleCompetitionDTO {
 
+  private Long id;
   private String title;
   private String introduction;
-  private Boolean isTeamGame;
-  private Boolean isPublic;
-  private Long creatorId;
-
+  private SimpleAccountDTO creator;
+  private Competition.Status status;
+  private boolean isTeamGame;
+  private boolean isPublic;
 }

@@ -1,4 +1,4 @@
-package com.compartytion.domain.competition.dto;
+package com.compartytion.domain.user.dto;
 
 
 import lombok.AccessLevel;
@@ -14,12 +14,8 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CompetitionCreationDTO {
+public class SimpleAccountDTO {
 
-  private String title;
-  private String introduction;
-  private Boolean isTeamGame;
-  private Boolean isPublic;
-  private Long creatorId;
-
+  private String username;
+  private String avatar;
 }

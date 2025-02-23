@@ -10,11 +10,13 @@ import java.util.Objects;
 import java.util.Set;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 
@@ -50,6 +52,17 @@ public class RestControllerExceptionHandler {
     body.put("message", message);
 
     return new ResponseEntity<>(body, e.getStatusCode());
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<?> handleMethodArgumentTypeMismatchException(
+      MethodArgumentTypeMismatchException e) {
+    Map<String, Object> body = new LinkedHashMap<>(Map.of(
+        "code", HttpStatus.BAD_REQUEST.value(),
+        "detail", e.getMessage()
+    ));
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
 }

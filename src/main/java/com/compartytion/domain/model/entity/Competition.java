@@ -2,12 +2,15 @@ package com.compartytion.domain.model.entity;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -34,6 +37,7 @@ import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
 public class Competition extends CreationTimeStampMixin {
 
   @ToString
+  @Getter
   @RequiredArgsConstructor
   public enum Status {
     RECRUIT("모집중"),
@@ -41,10 +45,26 @@ public class Competition extends CreationTimeStampMixin {
     PLAY("진행중"),
     DONE("종료");
 
+    private static final Map<Status, Status> transitionMap = Map.of(
+        RECRUIT, READY,
+        READY, PLAY,
+        PLAY, DONE
+    );
+
     private final String message;
+
+    public static Optional<Status> getNextStatus(Status status) {
+      Status result = transitionMap.get(status);
+
+      if (result == null) {
+        return Optional.empty();
+      }
+      return Optional.of(result);
+    }
   }
 
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(nullable = false)
@@ -63,9 +83,6 @@ public class Competition extends CreationTimeStampMixin {
   @Enumerated(EnumType.STRING)
   @Builder.Default
   private Status status = Status.RECRUIT;
-
-  @Column(nullable = false)
-  private Integer numOfParticipants;
 
   @Column(nullable = false, updatable = false)
   private boolean isTeamGame;

@@ -2,18 +2,20 @@ package com.compartytion.domain.competition.mapper;
 
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
+import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
+import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.model.entity.Competition;
+import com.compartytion.domain.user.dto.SimpleAccountDTO;
+import com.compartytion.domain.user.mapper.AccountMapper;
 
 
 public class CompetitionMapper {
 
-  public static Competition toEntity(Long competitionId, CompetitionCreationDTO creationDTO) {
+  public static Competition toEntity(CompetitionCreationDTO creationDTO) {
     return Competition.builder()
-        .id(competitionId)
         .title(creationDTO.getTitle())
         .introduction(creationDTO.getIntroduction())
-        .numOfParticipants(creationDTO.getNumOfParticipants())
         .isPublic(creationDTO.getIsPublic())
         .isTeamGame(creationDTO.getIsTeamGame())
         .creator(Account.builder()
@@ -22,5 +24,40 @@ public class CompetitionMapper {
         .build();
   }
 
+  public static Competition updateEntity(Competition entity,
+      CompetitionModificationDTO modificationDTO) {
+    Competition.CompetitionBuilder builder = Competition.builder();
+    builder.id(entity.getId());
+    builder.creator(entity.getCreator());
+    builder.isPublic(entity.isPublic());
+
+    if (modificationDTO.getTitle() != null) {
+      builder.title(modificationDTO.getTitle());
+    } else {
+      builder.title(entity.getTitle());
+    }
+
+    if (modificationDTO.getIntroduction() != null) {
+      builder.introduction(modificationDTO.getIntroduction());
+    } else {
+      builder.introduction(entity.getIntroduction());
+    }
+
+    return builder.build();
+  }
+
+  public static SimpleCompetitionDTO toSimpleCompetitionDTO(Competition competition) {
+    SimpleAccountDTO creatorDTO = AccountMapper.toSimpleAccountDTO(competition.getCreator());
+
+    return SimpleCompetitionDTO.builder()
+        .id(competition.getId())
+        .title(competition.getTitle())
+        .introduction(competition.getIntroduction())
+        .isPublic(competition.isPublic())
+        .isTeamGame(competition.isTeamGame())
+        .status(competition.getStatus())
+        .creator(creatorDTO)
+        .build();
+  }
 
 }
