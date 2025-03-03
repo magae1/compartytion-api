@@ -2,10 +2,14 @@ package com.compartytion.domain.competition.service;
 
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -16,12 +20,15 @@ import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
 import com.compartytion.domain.competition.dto.CompetitionDeletionDTO;
 import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeDTO;
+import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
 import com.compartytion.domain.competition.mapper.CompetitionMapper;
 import com.compartytion.domain.model.entity.Competition;
 import com.compartytion.domain.model.entity.Competition.Status;
 import com.compartytion.domain.repository.CompetitionRepository;
 import com.compartytion.domain.repository.projection.CompetitionStatusAndCreatorId;
+import com.compartytion.domain.repository.projection.IdAndTitleOnly;
+import com.compartytion.global.dto.PageResponse;
 
 import static com.compartytion.domain.competition.enums.CompetitionExceptions.CANT_CHANGE_STATUS;
 import static com.compartytion.domain.competition.enums.CompetitionExceptions.CANT_CREATE_COMPETITION;
@@ -51,7 +58,7 @@ public class CompetitionService {
       throw CANT_CREATE_COMPETITION.toResponseStatusException();
     }
   }
-  
+
   @Transactional
   @PreAuthorize("hasRole('USER')")
   public Long deleteCompetition(CompetitionDeletionDTO deletionDTO) throws ResponseStatusException {
@@ -141,5 +148,14 @@ public class CompetitionService {
         .accountId(statusChangeDTO.getAccountId())
         .competitionId(statusChangeDTO.getCompetitionId())
         .build();
+  }
+
+  @PreAuthorize("hasRole('USER')")
+  public PageResponse<CompetitionTitleOnlyResponse> getJoinedCompetitionPage(Long accountId,
+      Pageable pageable) {
+    Page<IdAndTitleOnly> res = competitionRepo.findJoinedCompetitionsByAccountId(accountId,
+        pageable);
+    return new PageResponse<>(res,
+        (proj) -> new CompetitionTitleOnlyResponse(proj.getId(), proj.getTitle()));
   }
 }

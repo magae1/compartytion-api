@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import com.compartytion.domain.user.dto.SimpleAccountDTO;
 
 
-public record CompetitionSimpleInfoResponse(
+public record SimpleCompetitionResponse(
     @Schema(description = "대회 ID")
     Long id,
     @Schema(description = "대회명")

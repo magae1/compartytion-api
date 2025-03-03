@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,21 +16,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeResponse;
+import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.competition.dto.request.CompetitionCreationRequest;
 import com.compartytion.domain.competition.dto.CompetitionDeletionDTO;
 import com.compartytion.domain.competition.dto.CompetitionResponse;
 import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
 import com.compartytion.domain.competition.dto.request.CompetitionModificationRequest;
-import com.compartytion.domain.competition.dto.CompetitionSimpleInfoResponse;
+import com.compartytion.domain.competition.dto.SimpleCompetitionResponse;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeDTO;
 import com.compartytion.domain.competition.dto.request.CompetitionStatusChangeRequest;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
 import com.compartytion.domain.competition.service.CompetitionService;
 import com.compartytion.domain.user.dto.AccountDetails;
+import com.compartytion.global.dto.PageResponse;
 
 import static com.compartytion.domain.competition.enums.CompetitionResponses.COMPETITION_CREATED;
 import static com.compartytion.domain.competition.enums.CompetitionResponses.COMPETITION_DELETED;
@@ -43,6 +47,7 @@ import static com.compartytion.domain.competition.enums.CompetitionResponses.COM
 @RequiredArgsConstructor
 public class CompetitionController {
 
+  private static final int DEFAULT_PAGE_SIZE = 5;
   private final CompetitionService competitionService;
 
   @Operation(summary = "새 대회 생성 요청")
@@ -127,12 +132,12 @@ public class CompetitionController {
 
   @Operation(summary = "대회 간단 정보 검색")
   @GetMapping("/{id}/simple")
-  public ResponseEntity<CompetitionSimpleInfoResponse> retrieveSimpleCompetition(
+  public ResponseEntity<SimpleCompetitionResponse> retrieveSimpleCompetition(
       @PathVariable Long id
   ) {
     SimpleCompetitionDTO simpleCompetitionDTO = competitionService.getSimpleCompetitionDTO(id);
 
-    return ResponseEntity.ok(new CompetitionSimpleInfoResponse(
+    return ResponseEntity.ok(new SimpleCompetitionResponse(
         simpleCompetitionDTO.getId(),
         simpleCompetitionDTO.getTitle(),
         simpleCompetitionDTO.getIntroduction(),
@@ -140,5 +145,15 @@ public class CompetitionController {
         simpleCompetitionDTO.getStatus().getMessage(),
         simpleCompetitionDTO.isTeamGame(),
         simpleCompetitionDTO.isPublic()));
+  }
+
+  @Operation(summary = "내 소속된 대회 목록")
+  @GetMapping("/join/me")
+  public ResponseEntity<PageResponse<CompetitionTitleOnlyResponse>> getJoinedCompetitionPage(
+      @AuthenticationPrincipal AccountDetails accountDetails,
+      @RequestParam(defaultValue = "1") int page) {
+    PageResponse<CompetitionTitleOnlyResponse> pageResponse = competitionService.getJoinedCompetitionPage(
+        accountDetails.getId(), PageRequest.of(Math.max(0, page - 1), DEFAULT_PAGE_SIZE));
+    return ResponseEntity.ok(pageResponse);
   }
 }

@@ -52,7 +52,6 @@ public class Participant extends CreationTimeStampMixin {
   private Integer index;
 
   @JsonIgnore // 직렬화 제외
-  @Column(nullable = false)
   private String password;
 
   private String email;

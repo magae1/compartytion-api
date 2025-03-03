@@ -3,6 +3,8 @@ package com.compartytion.domain.competition.mapper;
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
 import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
+import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
+import com.compartytion.domain.competition.dto.CompetitionPermissionsResponse;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.model.entity.Competition;
@@ -58,6 +60,12 @@ public class CompetitionMapper {
         .status(competition.getStatus())
         .creator(creatorDTO)
         .build();
+  }
+
+  public static CompetitionPermissionsResponse toPermissionsResponse(
+      CompetitionPermissionsDTO permissionsDTO) {
+    return new CompetitionPermissionsResponse(permissionsDTO.isManager(),
+        permissionsDTO.isParticipant());
   }
 
 }
