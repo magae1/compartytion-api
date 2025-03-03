@@ -26,7 +26,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
+import com.compartytion.domain.model.mixin.TimeStampMixin;
 
 
 @Entity
@@ -34,7 +34,7 @@ import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Competition extends CreationTimeStampMixin {
+public class Competition extends TimeStampMixin {
 
   @ToString
   @Getter
