@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
+import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
+import com.compartytion.domain.competition.dto.CompetitionPermissionsResponse;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeResponse;
 import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.competition.dto.request.CompetitionCreationRequest;
@@ -149,11 +151,27 @@ public class CompetitionController {
 
   @Operation(summary = "내 소속된 대회 목록")
   @GetMapping("/join/me")
-  public ResponseEntity<PageResponse<CompetitionTitleOnlyResponse>> getJoinedCompetitionPage(
+  public ResponseEntity<PageResponse<CompetitionTitleOnlyResponse>> getMyJoinedCompetitionPage(
       @AuthenticationPrincipal AccountDetails accountDetails,
       @RequestParam(defaultValue = "1") int page) {
     PageResponse<CompetitionTitleOnlyResponse> pageResponse = competitionService.getJoinedCompetitionPage(
         accountDetails.getId(), PageRequest.of(Math.max(0, page - 1), DEFAULT_PAGE_SIZE));
     return ResponseEntity.ok(pageResponse);
+  }
+
+  @Operation(summary = "내 대회 권한 조회")
+  @GetMapping("/{id}/permissions/me")
+  public ResponseEntity<CompetitionPermissionsResponse> getMyCompetitionPermissions(
+      @AuthenticationPrincipal AccountDetails accountDetails,
+      @PathVariable Long id
+  ) {
+    CompetitionPermissionsDTO permissionsDTO = competitionService.getCompetitionPermissions(id,
+        accountDetails.getId());
+
+    return ResponseEntity.ok(
+        new CompetitionPermissionsResponse(
+            permissionsDTO.isManager(),
+            permissionsDTO.isParticipant()
+        ));
   }
 }

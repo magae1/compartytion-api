@@ -3,6 +3,7 @@ package com.compartytion.domain.competition.service;
 
 import java.util.List;
 
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,14 +17,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
+import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
 import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.model.entity.Competition;
 import com.compartytion.domain.repository.CompetitionRepository;
+import com.compartytion.domain.repository.ParticipantRepository;
 import com.compartytion.domain.repository.projection.IdAndTitleOnly;
 import com.compartytion.global.dto.PageResponse;
 
@@ -34,6 +39,9 @@ public class CompetitionServiceTests {
 
   @Mock
   private CompetitionRepository competitionRepo;
+
+  @Mock
+  private ParticipantRepository participantRepo;
 
   @InjectMocks
   private CompetitionService competitionService;
@@ -113,5 +121,27 @@ public class CompetitionServiceTests {
             new CompetitionTitleOnlyResponse(1L, "test1"),
             new CompetitionTitleOnlyResponse(2L, "test2")),
         response.getResults());
+  }
+
+  @Test
+  @DisplayName("대회 권한 열람 테스트")
+  void testGetCompetitionPermissions() {
+    // Given
+    Account account = Account.builder()
+        .id(1L)
+        .build();
+    Competition competition = Competition.builder()
+        .id(1L)
+        .creator(account)
+        .build();
+    when(competitionRepo.findById(any())).thenReturn(Optional.of(competition));
+    when(participantRepo.existsByCompetitionIdAndAccountId(any(), any())).thenReturn(false);
+
+    // When
+    CompetitionPermissionsDTO permissionsDTO = competitionService.getCompetitionPermissions(1L, 1L);
+
+    // Then
+    assertTrue(permissionsDTO.isManager());
+    assertFalse(permissionsDTO.isParticipant());
   }
 }

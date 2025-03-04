@@ -2,8 +2,6 @@ package com.compartytion.domain.competition.service;
 
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
 import com.compartytion.domain.competition.dto.CompetitionDeletionDTO;
 import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
+import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeDTO;
 import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
@@ -26,6 +25,7 @@ import com.compartytion.domain.competition.mapper.CompetitionMapper;
 import com.compartytion.domain.model.entity.Competition;
 import com.compartytion.domain.model.entity.Competition.Status;
 import com.compartytion.domain.repository.CompetitionRepository;
+import com.compartytion.domain.repository.ParticipantRepository;
 import com.compartytion.domain.repository.projection.CompetitionStatusAndCreatorId;
 import com.compartytion.domain.repository.projection.IdAndTitleOnly;
 import com.compartytion.global.dto.PageResponse;
@@ -44,6 +44,7 @@ import static com.compartytion.domain.competition.enums.CompetitionExceptions.ST
 public class CompetitionService {
 
   private final CompetitionRepository competitionRepo;
+  private final ParticipantRepository participantRepo;
 
   @Transactional
   @PreAuthorize("hasRole('USER')")
@@ -88,9 +89,7 @@ public class CompetitionService {
   public Long modifyCompetition(CompetitionModificationDTO modificationDTO)
       throws ResponseStatusException {
     log.debug(modificationDTO);
-    Competition competition = competitionRepo.findById(modificationDTO.getCompetitionId())
-        .orElseThrow(COMPETITION_NOT_FOUND::toResponseStatusException);
-
+    Competition competition = getCompetitionEntity(modificationDTO.getCompetitionId());
     if (!Objects.equals(modificationDTO.getAccountId(), competition.getCreator().getId())) {
       throw NO_CREATOR_PERMISSION.toResponseStatusException();
     }
@@ -107,9 +106,7 @@ public class CompetitionService {
 
   public SimpleCompetitionDTO getSimpleCompetitionDTO(Long competitionId)
       throws ResponseStatusException {
-    Competition competition = competitionRepo.findById(competitionId)
-        .orElseThrow(COMPETITION_NOT_FOUND::toResponseStatusException);
-
+    Competition competition = getCompetitionEntity(competitionId);
     return CompetitionMapper.toSimpleCompetitionDTO(competition);
   }
 
@@ -157,5 +154,25 @@ public class CompetitionService {
         pageable);
     return new PageResponse<>(res,
         (proj) -> new CompetitionTitleOnlyResponse(proj.getId(), proj.getTitle()));
+  }
+
+  @Transactional(readOnly = true)
+  public CompetitionPermissionsDTO getCompetitionPermissions(Long competitionId, Long accountId)
+      throws ResponseStatusException {
+    Competition competition = getCompetitionEntity(competitionId);
+
+    boolean isManager = Objects.equals(competition.getCreator().getId(), accountId);
+    boolean isParticipant = participantRepo.existsByCompetitionIdAndAccountId(competitionId,
+        accountId);
+    return CompetitionPermissionsDTO.builder()
+        .isManager(isManager)
+        .isParticipant(isParticipant)
+        .build();
+  }
+
+  private Competition getCompetitionEntity(Long competitionId) throws ResponseStatusException {
+    log.debug("Find competition by ID: {}", competitionId);
+    return competitionRepo.findById(competitionId)
+        .orElseThrow(COMPETITION_NOT_FOUND::toResponseStatusException);
   }
 }

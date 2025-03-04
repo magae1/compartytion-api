@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -63,11 +62,4 @@ public class Participant extends CreationTimeStampMixin {
   private String hiddenName;
 
   private String shortIntroduction;
-
-  @PrePersist
-  private void initializeIndex() {
-    if (competition != null) {
-      index = competition.getParticipants().indexOf(this);
-    }
-  }
 }
