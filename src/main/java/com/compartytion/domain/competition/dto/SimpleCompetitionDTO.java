@@ -1,6 +1,7 @@
 package com.compartytion.domain.competition.dto;
 
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class SimpleCompetitionDTO {
   private String introduction;
   private SimpleAccountDTO creator;
   private Competition.Status status;
+  private LocalDateTime createdAt;
   private boolean isTeamGame;
   private boolean isPublic;
 }

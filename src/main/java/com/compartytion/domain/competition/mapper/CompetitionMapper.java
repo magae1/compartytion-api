@@ -6,9 +6,9 @@ import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
 import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
 import com.compartytion.domain.competition.dto.CompetitionPermissionsResponse;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
+import com.compartytion.domain.competition.dto.SimpleCompetitionResponse;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.model.entity.Competition;
-import com.compartytion.domain.user.dto.SimpleAccountDTO;
 import com.compartytion.domain.user.mapper.AccountMapper;
 
 
@@ -49,16 +49,15 @@ public class CompetitionMapper {
   }
 
   public static SimpleCompetitionDTO toSimpleCompetitionDTO(Competition competition) {
-    SimpleAccountDTO creatorDTO = AccountMapper.toSimpleAccountDTO(competition.getCreator());
-
     return SimpleCompetitionDTO.builder()
         .id(competition.getId())
         .title(competition.getTitle())
         .introduction(competition.getIntroduction())
+        .createdAt(competition.getCreatedAt())
         .isPublic(competition.isPublic())
         .isTeamGame(competition.isTeamGame())
         .status(competition.getStatus())
-        .creator(creatorDTO)
+        .creator(AccountMapper.toSimpleAccountDTO(competition.getCreator()))
         .build();
   }
 
@@ -68,4 +67,17 @@ public class CompetitionMapper {
         permissionsDTO.isParticipant());
   }
 
+  public static SimpleCompetitionResponse toSimpleCompetitionResponse(
+      SimpleCompetitionDTO simpleCompetitionDTO
+  ) {
+    return new SimpleCompetitionResponse(
+        simpleCompetitionDTO.getId(),
+        simpleCompetitionDTO.getTitle(),
+        simpleCompetitionDTO.getIntroduction(),
+        simpleCompetitionDTO.getCreator(),
+        simpleCompetitionDTO.getStatus().getMessage(),
+        simpleCompetitionDTO.getCreatedAt(),
+        simpleCompetitionDTO.isTeamGame(),
+        simpleCompetitionDTO.isPublic());
+  }
 }

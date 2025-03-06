@@ -33,6 +33,7 @@ import com.compartytion.domain.competition.dto.SimpleCompetitionResponse;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeDTO;
 import com.compartytion.domain.competition.dto.request.CompetitionStatusChangeRequest;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
+import com.compartytion.domain.competition.mapper.CompetitionMapper;
 import com.compartytion.domain.competition.service.CompetitionService;
 import com.compartytion.domain.user.dto.AccountDetails;
 import com.compartytion.global.dto.PageResponse;
@@ -139,14 +140,7 @@ public class CompetitionController {
   ) {
     SimpleCompetitionDTO simpleCompetitionDTO = competitionService.getSimpleCompetitionDTO(id);
 
-    return ResponseEntity.ok(new SimpleCompetitionResponse(
-        simpleCompetitionDTO.getId(),
-        simpleCompetitionDTO.getTitle(),
-        simpleCompetitionDTO.getIntroduction(),
-        simpleCompetitionDTO.getCreator(),
-        simpleCompetitionDTO.getStatus().getMessage(),
-        simpleCompetitionDTO.isTeamGame(),
-        simpleCompetitionDTO.isPublic()));
+    return ResponseEntity.ok(CompetitionMapper.toSimpleCompetitionResponse(simpleCompetitionDTO));
   }
 
   @Operation(summary = "내 소속된 대회 목록")
@@ -168,10 +162,6 @@ public class CompetitionController {
     CompetitionPermissionsDTO permissionsDTO = competitionService.getCompetitionPermissions(id,
         accountDetails.getId());
 
-    return ResponseEntity.ok(
-        new CompetitionPermissionsResponse(
-            permissionsDTO.isManager(),
-            permissionsDTO.isParticipant()
-        ));
+    return ResponseEntity.ok(CompetitionMapper.toPermissionsResponse(permissionsDTO));
   }
 }
