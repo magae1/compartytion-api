@@ -1,7 +1,8 @@
-package com.compartytion.domain.competition.dto;
+package com.compartytion.domain.competition.dto.response;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
 import com.compartytion.domain.user.dto.SimpleAccountDTO;

@@ -14,11 +14,11 @@ import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.repository.AccountRepository;
 import com.compartytion.domain.repository.ForgivenPasswordRepository;
 import com.compartytion.domain.repository.UnauthenticatedEmailRepository;
-import com.compartytion.domain.user.dto.EmailExistenceResponse;
-import com.compartytion.domain.user.dto.EmailOTPRequest;
-import com.compartytion.domain.user.dto.EmailOTPResponse;
-import com.compartytion.domain.user.dto.PasswordChangeRequest;
-import com.compartytion.domain.user.dto.SignUpRequest;
+import com.compartytion.domain.user.dto.response.EmailExistenceResponse;
+import com.compartytion.domain.user.dto.request.EmailOTPRequest;
+import com.compartytion.domain.user.dto.response.EmailOTPResponse;
+import com.compartytion.domain.user.dto.request.PasswordChangeRequest;
+import com.compartytion.domain.user.dto.request.SignUpRequest;
 import com.compartytion.domain.user.mapper.AccountMapper;
 import com.compartytion.global.component.OTPGenerator;
 import com.compartytion.global.component.EmailSender;
@@ -94,7 +94,7 @@ public class AuthService {
    * 이메일 존재 여부를 확인합니다.
    *
    * @param email 존재하는지 확인할 이메일
-   * @return {@link com.compartytion.domain.user.dto.EmailExistenceResponse}
+   * @return {@link EmailExistenceResponse}
    */
   public EmailExistenceResponse checkEmailExistence(String email) {
     boolean exists = existsByEmail(email);
@@ -105,7 +105,7 @@ public class AuthService {
    * 회원가입을 위한 OTP를 전송합니다.
    *
    * @param email OTP를 수신할 이메일
-   * @return {@link com.compartytion.domain.user.dto.EmailOTPResponse}
+   * @return {@link EmailOTPResponse}
    * @throws ResponseStatusException OTP 전송 실패 시 발생
    */
   public EmailOTPResponse sendOTPForSignup(String email) throws ResponseStatusException {
@@ -123,7 +123,7 @@ public class AuthService {
   /**
    * 회원가입을 위한 OTP 인증을 시도합니다.
    *
-   * @param request {@link com.compartytion.domain.user.dto.EmailOTPRequest}
+   * @param request {@link EmailOTPRequest}
    * @throws ResponseStatusException OTP 인증 실패 시 발생
    */
   public void verifyOTPForSignup(EmailOTPRequest request) throws ResponseStatusException {
@@ -145,7 +145,7 @@ public class AuthService {
    * 비밀번호 변경을 위한 OTP를 전송합니다.
    *
    * @param email OTP를 수신할 이메일
-   * @return {@link com.compartytion.domain.user.dto.EmailOTPResponse}
+   * @return {@link EmailOTPResponse}
    * @throws ResponseStatusException OTP 발송 실패 시 발생
    */
   public EmailOTPResponse sendOTPForChangePassword(String email) throws ResponseStatusException {
@@ -162,7 +162,7 @@ public class AuthService {
   /**
    * 비밀번호 변경을 위한 OTP 인증을 시도합니다.
    *
-   * @param request {@link com.compartytion.domain.user.dto.EmailOTPRequest}
+   * @param request {@link EmailOTPRequest}
    * @throws ResponseStatusException 인증 실패 시 발생
    */
   public void verifyOTPForChangePassword(EmailOTPRequest request) throws ResponseStatusException {
@@ -184,7 +184,7 @@ public class AuthService {
    * 비밀번호 변경을 시도합니다.
    *
    * @param email   비밀번호를 변경하고자 하는 계정의 이메일
-   * @param request {@link com.compartytion.domain.user.dto.PasswordChangeRequest}
+   * @param request {@link PasswordChangeRequest}
    * @throws ResponseStatusException 비밀번호 변경 실패 시 발생
    */
   public void changePassword(String email, PasswordChangeRequest request)
@@ -212,7 +212,7 @@ public class AuthService {
   /**
    * 회원가입을 시도합니다.
    *
-   * @param request {@link com.compartytion.domain.user.dto.SignUpRequest}
+   * @param request {@link SignUpRequest}
    * @throws ResponseStatusException 회원가입 실패 시 발생
    */
   public void signUp(SignUpRequest request) throws ResponseStatusException {

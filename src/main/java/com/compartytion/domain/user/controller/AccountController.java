@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.compartytion.domain.repository.projection.DetailAccountInfo;
 import com.compartytion.domain.repository.projection.SimpleAccountInfo;
 import com.compartytion.domain.user.dto.AccountDetails;
-import com.compartytion.domain.user.dto.DetailAccountResponse;
-import com.compartytion.domain.user.dto.SimpleAccountResponse;
+import com.compartytion.domain.user.dto.response.DetailAccountResponse;
+import com.compartytion.domain.user.dto.response.SimpleAccountResponse;
 import com.compartytion.domain.user.mapper.AccountMapper;
 import com.compartytion.domain.user.service.AccountService;
 

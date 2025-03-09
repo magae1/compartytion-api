@@ -19,7 +19,7 @@ import com.compartytion.domain.competition.dto.CompetitionDeletionDTO;
 import com.compartytion.domain.competition.dto.CompetitionModificationDTO;
 import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
 import com.compartytion.domain.competition.dto.CompetitionStatusChangeDTO;
-import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
+import com.compartytion.domain.competition.dto.response.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.competition.dto.SimpleCompetitionDTO;
 import com.compartytion.domain.competition.mapper.CompetitionMapper;
 import com.compartytion.domain.model.entity.Competition;

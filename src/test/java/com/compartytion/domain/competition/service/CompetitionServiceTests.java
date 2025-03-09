@@ -4,6 +4,7 @@ package com.compartytion.domain.competition.service;
 import java.util.List;
 
 import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
 import com.compartytion.domain.competition.dto.CompetitionPermissionsDTO;
-import com.compartytion.domain.competition.dto.CompetitionTitleOnlyResponse;
+import com.compartytion.domain.competition.dto.response.CompetitionTitleOnlyResponse;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.model.entity.Competition;
 import com.compartytion.domain.repository.CompetitionRepository;

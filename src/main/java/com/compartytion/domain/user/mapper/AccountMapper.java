@@ -4,10 +4,10 @@ package com.compartytion.domain.user.mapper;
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.repository.projection.DetailAccountInfo;
 import com.compartytion.domain.repository.projection.SimpleAccountInfo;
-import com.compartytion.domain.user.dto.DetailAccountResponse;
-import com.compartytion.domain.user.dto.SignUpRequest;
+import com.compartytion.domain.user.dto.response.DetailAccountResponse;
+import com.compartytion.domain.user.dto.request.SignUpRequest;
 import com.compartytion.domain.user.dto.SimpleAccountDTO;
-import com.compartytion.domain.user.dto.SimpleAccountResponse;
+import com.compartytion.domain.user.dto.response.SimpleAccountResponse;
 
 
 public class AccountMapper {

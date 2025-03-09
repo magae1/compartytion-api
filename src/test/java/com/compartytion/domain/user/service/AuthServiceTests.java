@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.compartytion.domain.user.dto.EmailExistenceResponse;
+import com.compartytion.domain.user.dto.response.EmailExistenceResponse;
 import com.compartytion.domain.repository.AccountRepository;
 import com.compartytion.domain.repository.UnauthenticatedEmailRepository;
 import com.compartytion.global.component.OTPGenerator;

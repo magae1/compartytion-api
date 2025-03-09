@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.compartytion.domain.user.dto.EmailExistenceResponse;
-import com.compartytion.domain.user.dto.EmailOTPRequest;
-import com.compartytion.domain.user.dto.EmailOTPResponse;
-import com.compartytion.domain.user.dto.EmailRequest;
-import com.compartytion.domain.user.dto.PasswordChangeRequest;
-import com.compartytion.domain.user.dto.SignUpRequest;
+import com.compartytion.domain.user.dto.response.EmailExistenceResponse;
+import com.compartytion.domain.user.dto.request.EmailOTPRequest;
+import com.compartytion.domain.user.dto.response.EmailOTPResponse;
+import com.compartytion.domain.user.dto.request.EmailRequest;
+import com.compartytion.domain.user.dto.request.PasswordChangeRequest;
+import com.compartytion.domain.user.dto.request.SignUpRequest;
 import com.compartytion.domain.user.service.AuthService;
 import com.compartytion.global.dto.ActionResponse;
 
