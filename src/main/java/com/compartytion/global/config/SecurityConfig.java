@@ -51,6 +51,7 @@ public class SecurityConfig {
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .requestMatchers("/auth/**").permitAll()
             .requestMatchers("/competitions/{id}/simple").permitAll()
+            .requestMatchers("/applications").permitAll()
             .requestMatchers("/error/**").permitAll()
             .anyRequest().authenticated());
     return http.build();

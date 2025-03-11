@@ -7,11 +7,11 @@ import com.compartytion.global.utils.RandomGenerator;
 
 
 @Component
-public class CharIdGenerator extends RandomGenerator {
+public class CharAndNumberIdGenerator extends RandomGenerator {
 
 
-  public CharIdGenerator() {
-    super("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  public CharAndNumberIdGenerator() {
+    super("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   }
 
   @Override

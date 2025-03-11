@@ -99,4 +99,6 @@ public class Competition extends TimeStampMixin {
   @OneToMany(mappedBy = "competition")
   List<Participant> participants;
 
+  @OneToMany(mappedBy = "competition")
+  List<Application> applications;
 }

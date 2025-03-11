@@ -12,11 +12,14 @@ import org.springframework.data.domain.PageRequest;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.compartytion.domain.competition.dto.CompetitionCreationDTO;
 import com.compartytion.domain.competition.mapper.CompetitionMapper;
 import com.compartytion.domain.model.entity.Account;
+import com.compartytion.domain.model.entity.Application;
 import com.compartytion.domain.model.entity.Competition;
 import com.compartytion.domain.model.entity.Competition.Status;
 import com.compartytion.domain.model.entity.Participant;
@@ -34,6 +37,9 @@ public class CompetitionsRepositoryTests {
 
   @Autowired
   private ParticipantRepository participantRepo;
+
+  @Autowired
+  private ApplicationRepository applicationRepo;
 
 
   @Test
@@ -194,4 +200,108 @@ public class CompetitionsRepositoryTests {
     });
   }
 
+  @Test
+  void givenCompetitionWithParticipant_whenExistsInParticipantAndApplicationsByIdAndAccountId_thenReturnTrue() {
+    // Given
+    Account creatorAccount = accountRepo.save(Account.builder()
+        .email("test1@example.com")
+        .username("test-user1")
+        .password("123456")
+        .build());
+
+    Account participantAccount = accountRepo.save(Account.builder()
+        .email("test2@example.com")
+        .username("test-user2")
+        .password("123456")
+        .build());
+
+    Competition competition =
+        competitionRepo.save(Competition.builder()
+            .creator(creatorAccount)
+            .title("test competition")
+            .introduction("Hi! It's test competition.")
+            .isPublic(false)
+            .isTeamGame(false)
+            .build());
+    participantRepo.save(Participant.builder()
+        .account(participantAccount)
+        .competition(competition)
+        .displayedName("test-displayed-name")
+        .hiddenName("test-hidden-name")
+        .identifier("asdfgh")
+        .index(0)
+        .build());
+
+    // When
+    boolean result = competitionRepo.existsInParticipantAndApplicationsByIdAndAccountId(
+        competition.getId(), participantAccount.getId());
+
+    // Then
+    assertTrue(result);
+  }
+
+  @Test
+  void givenCompetitionWithApplication_whenExistsInParticipantAndApplicationsByIdAndAccountId_thenReturnTrue() {
+    // Given
+    Account creatorAccount = accountRepo.save(Account.builder()
+        .email("test1@example.com")
+        .username("test-user1")
+        .password("123456")
+        .build());
+
+    Account applicatantAccount = accountRepo.save(Account.builder()
+        .email("test2@example.com")
+        .username("test-user2")
+        .password("123456")
+        .build());
+
+    Competition competition =
+        competitionRepo.save(Competition.builder()
+            .creator(creatorAccount)
+            .title("test competition")
+            .introduction("Hi! It's test competition.")
+            .isPublic(false)
+            .isTeamGame(false)
+            .build());
+    applicationRepo.save(
+        Application.builder()
+            .account(applicatantAccount)
+            .competition(competition)
+            .displayedName("test-displayed-name")
+            .hiddenName("test-hidden-name")
+            .identifier("asdfgh")
+            .build());
+
+    // When
+    boolean result = competitionRepo.existsInParticipantAndApplicationsByIdAndAccountId(
+        competition.getId(), applicatantAccount.getId());
+
+    // Then
+    assertTrue(result);
+  }
+
+  @Test
+  void givenCompetitionWithJustCreator_whenExistsInParticipantAndApplicationsByIdAndAccountId_thenReturnFalse() {
+    // Given
+    Account creatorAccount = accountRepo.save(Account.builder()
+        .email("test1@example.com")
+        .username("test-user1")
+        .password("123456")
+        .build());
+    Competition competition =
+        competitionRepo.save(Competition.builder()
+            .creator(creatorAccount)
+            .title("test competition")
+            .introduction("Hi! It's test competition.")
+            .isPublic(false)
+            .isTeamGame(false)
+            .build());
+
+    // When
+    boolean result = competitionRepo.existsInParticipantAndApplicationsByIdAndAccountId(
+        competition.getId(), creatorAccount.getId());
+
+    // Then
+    assertFalse(result);
+  }
 }

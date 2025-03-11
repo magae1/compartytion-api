@@ -34,4 +34,10 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
       + "WHERE c.status <> com.compartytion.domain.model.entity.Competition.Status.DONE AND (c.creator.id = :accountId "
       + "OR EXISTS (SELECT 1 FROM Participant p WHERE p.competition.id = c.id AND p.account.id = :accountId))")
   Page<IdAndTitleOnly> findJoinedCompetitionsByAccountId(Long accountId, Pageable pageable);
+
+  @Query(value = "SELECT COUNT(c) > 0 "
+      + "FROM Competition c "
+      + "WHERE EXISTS (SELECT p FROM c.participants p WHERE c.id = :id AND p.account.id = :accountId) "
+      + "OR EXISTS (SELECT a FROM c.applications a WHERE c.id = :id AND a.account.id = :accountId)")
+  boolean existsInParticipantAndApplicationsByIdAndAccountId(Long id, Long accountId);
 }
