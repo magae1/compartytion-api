@@ -172,8 +172,7 @@ public class CompetitionsRepositoryTests {
         .isTeamGame(false)
         .participants(List.of(Participant.builder()
             .account(account1)
-            .displayedName("participant1")
-            .hiddenName("part-test-user1")
+            .name("participant1")
             .identifier("123456")
             .index(0)
             .build()))
@@ -182,8 +181,7 @@ public class CompetitionsRepositoryTests {
     Participant participant = Participant.builder()
         .account(account1)
         .competition(competition2)
-        .displayedName("test-displayed-name")
-        .hiddenName("test-hidden-name")
+        .name("participant1")
         .identifier("asdfgh")
         .index(0)
         .build();
@@ -226,8 +224,7 @@ public class CompetitionsRepositoryTests {
     participantRepo.save(Participant.builder()
         .account(participantAccount)
         .competition(competition)
-        .displayedName("test-displayed-name")
-        .hiddenName("test-hidden-name")
+        .name("test-name")
         .identifier("asdfgh")
         .index(0)
         .build());
@@ -267,9 +264,7 @@ public class CompetitionsRepositoryTests {
         Application.builder()
             .account(applicatantAccount)
             .competition(competition)
-            .displayedName("test-displayed-name")
-            .hiddenName("test-hidden-name")
-            .identifier("asdfgh")
+            .name("test-name")
             .build());
 
     // When

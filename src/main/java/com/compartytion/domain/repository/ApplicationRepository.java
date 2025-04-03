@@ -8,11 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.compartytion.domain.model.entity.Application;
-import com.compartytion.domain.model.entity.key.CompetitionSubId;
+import com.compartytion.domain.model.entity.key.ApplicationCompositeKey;
 
 
 @Repository
-public interface ApplicationRepository extends JpaRepository<Application, CompetitionSubId> {
+public interface ApplicationRepository extends JpaRepository<Application, ApplicationCompositeKey> {
 
   @Query(value = "SELECT p.identifier "
       + "FROM Participant p "

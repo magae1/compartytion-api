@@ -19,13 +19,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.compartytion.domain.model.entity.key.CompetitionSubId;
+import com.compartytion.domain.model.entity.key.ApplicationCompositeKey;
 import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
 
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"competition_id", "index"}))
-@IdClass(CompetitionSubId.class)
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"competition_id", "index"}),
+    @UniqueConstraint(columnNames = {"competition_id", "email"})})
+@IdClass(ApplicationCompositeKey.class)
 @Getter
 @Builder
 @AllArgsConstructor
@@ -50,16 +51,14 @@ public class Participant extends CreationTimeStampMixin {
   @Column(nullable = false)
   private Integer index;
 
+  @Column(nullable = false)
+  private String email;
+
   @JsonIgnore // 직렬화 제외
   private String password;
 
-  private String email;
-
   @Column(nullable = false, length = 150)
-  private String displayedName;
-
-  @Column(nullable = false, length = 150)
-  private String hiddenName;
+  private String name;
 
   private String shortIntroduction;
 }

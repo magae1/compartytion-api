@@ -68,8 +68,7 @@ public class ApplicationRepositoryTests {
     Application application = Application.builder()
         .account(applicantAccount)
         .competition(competition)
-        .displayedName("displayed-applicant")
-        .hiddenName("hidden-applicant")
+        .name("applicant")
         .identifier("abcdef")
         .build();
     applicationRepo.save(application);
@@ -77,8 +76,7 @@ public class ApplicationRepositoryTests {
         .account(participantAccount)
         .competition(competition)
         .index(0)
-        .displayedName("displayed-participant")
-        .hiddenName("hidden-participant")
+        .name("participant")
         .identifier("basedf")
         .build();
     participantRepo.save(participant);

@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,12 +18,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.compartytion.domain.model.entity.key.CompetitionSubId;
+import com.compartytion.domain.model.entity.key.ApplicationCompositeKey;
 import com.compartytion.domain.model.mixin.CreationTimeStampMixin;
 
 
 @Entity
-@IdClass(CompetitionSubId.class)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"competition_id", "email"}))
+@IdClass(ApplicationCompositeKey.class)
 @Getter
 @Builder
 @AllArgsConstructor
@@ -37,19 +40,17 @@ public class Application extends CreationTimeStampMixin {
   @Id
   private String identifier;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Account account;
+  @Column(nullable = false)
+  private String email;
 
   @JsonIgnore // 직렬화 제외
   private String password;
 
-  private String email;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Account account;
 
   @Column(nullable = false, length = 150)
-  private String displayedName;
-
-  @Column(nullable = false, length = 150)
-  private String hiddenName;
+  private String name;
 
   private String shortIntroduction;
 }

@@ -1,11 +1,14 @@
 package com.compartytion.domain.repository;
 
 
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,19 +29,20 @@ public class ParticipantRepositoryTests {
   @Autowired
   private CompetitionRepository competitionRepo;
 
-  private Competition testCompetition;
+  private Account creatorAccount;
+  private Competition competition;
 
   @BeforeEach
-  void init() {
-    Account testAccount = accountRepo.save(Account.builder()
+  void setUp() {
+    creatorAccount = accountRepo.save(Account.builder()
         .email("test@example.com")
-        .password("123456")
         .username("test-user")
+        .password("123456")
         .build());
-    testCompetition = competitionRepo.save(Competition.builder()
-        .creator(testAccount)
+    competition = competitionRepo.save(Competition.builder()
+        .creator(creatorAccount)
         .title("test competition")
-        .introduction("Hi! It's a test competition.")
+        .introduction("Hi! It's test competition.")
         .isPublic(false)
         .isTeamGame(false)
         .build());
@@ -55,7 +59,7 @@ public class ParticipantRepositoryTests {
     accountRepo.save(participantAccount);
 
     // When
-    boolean exists = participantRepo.existsByCompetitionIdAndAccountId(testCompetition.getId(),
+    boolean exists = participantRepo.existsByCompetitionIdAndAccountId(competition.getId(),
         participantAccount.getId());
 
     // Then
@@ -72,19 +76,48 @@ public class ParticipantRepositoryTests {
         .build();
     accountRepo.save(participantAccount);
     participantRepo.save(Participant.builder()
-        .competition(testCompetition)
-        .displayedName("displayed participant")
-        .hiddenName("hidden participant")
+        .competition(competition)
+        .email(participantAccount.getEmail())
+        .name("participant")
         .identifier("123456")
         .index(0)
         .account(participantAccount)
         .build());
 
     // When
-    boolean exists = participantRepo.existsByCompetitionIdAndAccountId(testCompetition.getId(),
+    boolean exists = participantRepo.existsByCompetitionIdAndAccountId(competition.getId(),
         participantAccount.getId());
 
     // Then
     assertTrue(exists);
   }
+
+  @Test
+  void testFindAllIdentifier() {
+    // Given
+    Account participantAccount = Account.builder()
+        .email("test2@example.com")
+        .username("test-participant")
+        .password("123456")
+        .build();
+    participantAccount = accountRepo.save(participantAccount);
+
+    Participant participant = Participant.builder()
+        .account(participantAccount)
+        .competition(competition)
+        .index(0)
+        .email("test@example.com")
+        .name("participant")
+        .identifier("basedf")
+        .build();
+    participantRepo.save(participant);
+    Long competitionId = competition.getId();
+
+    // When
+    Set<?> identifierSet = participantRepo.findAllIdentifier(competitionId);
+
+    // Then
+    assertEquals(Set.of("basedf"), identifierSet);
+  }
+
 }

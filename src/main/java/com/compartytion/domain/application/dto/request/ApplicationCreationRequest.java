@@ -5,24 +5,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 
 public record ApplicationCreationRequest(
+    @NotNull(message = "잘못된 대회 ID입니다.")
     @Schema(description = "대회 ID", example = "1")
-    @NotNull(message = "대회 ID가 입력되지 않았습니다.")
     Long competitionId,
-    @Schema(description = "비밀번호", example = "password", nullable = true)
+    @Schema(description = "비밀번호", example = "passWord1", nullable = true)
     String password,
-    @Schema(description = "비밀번호(확인)", example = "password", nullable = true)
+    @Schema(description = "비밀번호(확인)", example = "passWord1", nullable = true)
     String confirmedPassword,
-    @Schema(description = "이메일", example = "application@example.com", nullable = true)
+    @NotNull(message = "이메일은 반드시 입력해야 합니다.")
     @Email(message = "올바르지 않은 이메일 형식입니다.")
+    @Schema(description = "이메일", example = "application@example.com")
     String email,
-    @Schema(description = "이름(공개)", example = "displayed-name")
-    @NotBlank(message = "이름(공개)은 반드시 입력되어야 합니다.")
-    String displayedName,
-    @Schema(description = "이름(비공개)", example = "hidden-name")
-    @NotBlank(message = "이름(비공개)은 반드시 입력되어야 합니다.")
-    String hiddenName,
+    @NotBlank(message = "이름은 반드시 입력해야 합니다.")
+    @Size(max = 150, message = "이름은 최대 150까지 입력 가능합니다.")
+    @Schema(description = "이름", example = "test-name")
+    String name,
     @Schema(description = "소개", example = "hi!", nullable = true)
     String shortIntroduction
 ) {

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class CompetitionSubId implements Serializable {
+public class ApplicationCompositeKey implements Serializable {
 
   private String identifier;
 

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.compartytion.global.exception.InvalidFormException;
+
 
 @Hidden
 @RestControllerAdvice
@@ -60,6 +62,17 @@ public class RestControllerExceptionHandler {
         "code", HttpStatus.BAD_REQUEST.value(),
         "detail", e.getMessage()
     ));
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(InvalidFormException.class)
+  public ResponseEntity<?> handleInvalidFormException(InvalidFormException e) {
+    Map<String, Object> body = new LinkedHashMap<>(Map.of(
+        "code", HttpStatus.BAD_REQUEST.value()
+    ));
+
+    body.put("message", e.getMessageMap());
 
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }

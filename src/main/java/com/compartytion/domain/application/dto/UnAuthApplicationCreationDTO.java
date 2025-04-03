@@ -1,6 +1,5 @@
 package com.compartytion.domain.application.dto;
 
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,11 +13,12 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ApplicationCreationDTO {
+public class UnAuthApplicationCreationDTO {
 
   private Long competitionId;
-  private Long accountId;
   private String email;
+  private String password;
+  private String confirmedPassword;
   private String name;
   private String shortIntroduction;
 }

@@ -40,4 +40,10 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
       + "WHERE EXISTS (SELECT p FROM c.participants p WHERE c.id = :id AND p.account.id = :accountId) "
       + "OR EXISTS (SELECT a FROM c.applications a WHERE c.id = :id AND a.account.id = :accountId)")
   boolean existsInParticipantAndApplicationsByIdAndAccountId(Long id, Long accountId);
+
+  @Query(value = "SELECT COUNT(c) > 0 "
+      + "FROM Competition c "
+      + "WHERE EXISTS (SELECT p FROM c.participants p WHERE c.id = :id AND p.email = :email) "
+      + "OR EXISTS (SELECT a FROM c.applications a WHERE c.id = :id AND a.email = :email)")
+  boolean existsInParticipantAndApplicationsByIdAndEmail(Long id, String email);
 }
