@@ -1,4 +1,4 @@
-package com.compartytion.global.component;
+package com.compartytion.global.utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +23,7 @@ public class PasswordValidator {
   public static void validate(String password, String confirmedPassword)
       throws InvalidFormException {
     Map<String, List<String>> msgMap = new HashMap<>();
-    if (password == null) {
+    if (password == null || password.isBlank()) {
       msgMap.put("password", List.of("비밀번호는 반드시 입력헤야 합니다."));
     } else {
       if (!PasswordValidator.isValid(password)) {
@@ -31,7 +31,7 @@ public class PasswordValidator {
       }
     }
 
-    if (confirmedPassword == null) {
+    if (confirmedPassword == null || confirmedPassword.isBlank()) {
       msgMap.put("confirmedPassword", List.of("비밀번호(확인)은 반드시 입력해야 합니다."));
     } else {
       if (!confirmedPassword.equals(password)) {

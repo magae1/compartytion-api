@@ -21,7 +21,7 @@ import com.compartytion.domain.repository.ApplicationRepository;
 import com.compartytion.domain.repository.CompetitionRepository;
 import com.compartytion.domain.repository.projection.CompetitionStatusAndCreatorId;
 import com.compartytion.global.component.CharAndNumberIdGenerator;
-import com.compartytion.global.component.PasswordValidator;
+import com.compartytion.global.utils.PasswordValidator;
 import com.compartytion.global.exception.InvalidFormException;
 
 import static com.compartytion.domain.application.enums.ApplicationExceptions.ALREADY_LISTED;

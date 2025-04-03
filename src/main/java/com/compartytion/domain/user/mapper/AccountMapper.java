@@ -1,6 +1,8 @@
 package com.compartytion.domain.user.mapper;
 
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.compartytion.domain.model.entity.Account;
 import com.compartytion.domain.repository.projection.DetailAccountInfo;
 import com.compartytion.domain.repository.projection.SimpleAccountInfo;
@@ -12,11 +14,11 @@ import com.compartytion.domain.user.dto.response.SimpleAccountResponse;
 
 public class AccountMapper {
 
-  public static Account toEntity(SignUpRequest signUpRequest, String encryptedPassword) {
+  public static Account toEntity(SignUpRequest signUpRequest, PasswordEncoder passwordEncoder) {
     return Account.builder()
         .email(signUpRequest.email())
         .username(signUpRequest.username())
-        .password(encryptedPassword)
+        .password(passwordEncoder.encode(signUpRequest.password()))
         .build();
   }
 

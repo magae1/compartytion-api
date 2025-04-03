@@ -16,7 +16,7 @@ public record ApplicationCreationRequest(
     String password,
     @Schema(description = "비밀번호(확인)", example = "passWord1", nullable = true)
     String confirmedPassword,
-    @NotNull(message = "이메일은 반드시 입력해야 합니다.")
+    @NotBlank(message = "이메일은 반드시 입력해야 합니다.")
     @Email(message = "올바르지 않은 이메일 형식입니다.")
     @Schema(description = "이메일", example = "application@example.com")
     String email,

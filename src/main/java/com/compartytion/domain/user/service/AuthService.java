@@ -22,13 +22,14 @@ import com.compartytion.domain.user.dto.request.SignUpRequest;
 import com.compartytion.domain.user.mapper.AccountMapper;
 import com.compartytion.global.component.OTPGenerator;
 import com.compartytion.global.component.EmailSender;
+import com.compartytion.global.utils.PasswordValidator;
+import com.compartytion.global.exception.InvalidFormException;
 
 import static com.compartytion.domain.user.enums.AuthExceptions.ALREADY_VERIFIED_EMAIL;
 import static com.compartytion.domain.user.enums.AuthExceptions.DUPLICATED_EMAIL;
 import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_EMAIL;
 import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_FORGIVEN_PASSWORD;
 import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_UNAUTHENTICATED_EMAIL;
-import static com.compartytion.domain.user.enums.AuthExceptions.NOT_MATCHED_PASSWORD;
 import static com.compartytion.domain.user.enums.AuthExceptions.NOT_VERIFIED_EMAIL;
 import static com.compartytion.domain.user.enums.AuthExceptions.WRONG_OTP;
 
@@ -189,12 +190,7 @@ public class AuthService {
    */
   public void changePassword(String email, PasswordChangeRequest request)
       throws ResponseStatusException {
-    String newPassword = request.newPassword();
-    String newConfirmedPassword = request.newConfirmedPassword();
-
-    if (!newPassword.equals(newConfirmedPassword)) {
-      throw NOT_MATCHED_PASSWORD.toResponseStatusException();
-    }
+    PasswordValidator.validate(request.password(), request.confirmedPassword());
 
     ForgivenPassword forgivenPassword = forgivenPasswordRepo.findById(email)
         .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toResponseStatusException);
@@ -205,7 +201,7 @@ public class AuthService {
 
     Account account = accountRepo.findByEmail(email)
         .orElseThrow(NOT_FOUND_EMAIL::toResponseStatusException);
-    account.changePassword(newPassword, passwordEncoder);
+    account.changePassword(request.password(), passwordEncoder);
     accountRepo.save(account);
   }
 
@@ -215,12 +211,8 @@ public class AuthService {
    * @param request {@link SignUpRequest}
    * @throws ResponseStatusException 회원가입 실패 시 발생
    */
-  public void signUp(SignUpRequest request) throws ResponseStatusException {
-    String password = request.password();
-    String confirmedPassword = request.confirmedPassword();
-    if (!password.equals(confirmedPassword)) {
-      throw NOT_MATCHED_PASSWORD.toResponseStatusException();
-    }
+  public void signUp(SignUpRequest request) throws ResponseStatusException, InvalidFormException {
+    PasswordValidator.validate(request.password(), request.confirmedPassword());
 
     UnauthenticatedEmail unauthenticatedEmail = unauthenticatedEmailRepo.findById(request.email())
         .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toResponseStatusException);
@@ -235,8 +227,7 @@ public class AuthService {
     }
 
     log.info("Sign up with email {}", request.email());
-    String encryptedPassword = passwordEncoder.encode(password);
-    Account account = AccountMapper.toEntity(request, encryptedPassword);
+    Account account = AccountMapper.toEntity(request, passwordEncoder);
     accountRepo.save(account);
     unauthenticatedEmailRepo.deleteById(request.email());
   }
