@@ -174,6 +174,7 @@ public class CompetitionsRepositoryTests {
             .account(account1)
             .name("participant1")
             .identifier("123456")
+            .email("participant1@example.com")
             .index(0)
             .build()))
         .build();
@@ -182,6 +183,7 @@ public class CompetitionsRepositoryTests {
         .account(account1)
         .competition(competition2)
         .name("participant1")
+        .email("participant2@example.com")
         .identifier("asdfgh")
         .index(0)
         .build();
@@ -225,6 +227,7 @@ public class CompetitionsRepositoryTests {
         .account(participantAccount)
         .competition(competition)
         .name("test-name")
+        .email("text@example.com")
         .identifier("asdfgh")
         .index(0)
         .build());
@@ -264,6 +267,8 @@ public class CompetitionsRepositoryTests {
         Application.builder()
             .account(applicatantAccount)
             .competition(competition)
+            .identifier("abcded")
+            .email("test@example.com")
             .name("test-name")
             .build());
 

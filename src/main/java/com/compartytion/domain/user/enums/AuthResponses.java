@@ -15,6 +15,7 @@ import com.compartytion.global.dto.ActionResponseEntityBuilder;
 @ToString
 @RequiredArgsConstructor
 public enum AuthResponses implements ActionResponseEntityBuilder {
+  OTP_SEND(HttpStatus.OK, "OTP가 전송됐습니다."),
   EMAIL_VERIFIED(HttpStatus.OK, "이메일이 확인됐습니다."),
   PASSWORD_CHANGED(HttpStatus.OK, "비밀번호가 변경됐습니다."),
   SIGN_UP_COMPLETED(HttpStatus.CREATED, "회원가입이 완료됐습니다.");

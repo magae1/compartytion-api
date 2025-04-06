@@ -13,7 +13,7 @@ import com.compartytion.domain.user.dto.AccountDetails;
 import com.compartytion.domain.user.service.AccountDetailsService;
 import com.compartytion.domain.user.token.AccountAuthenticationToken;
 
-import static com.compartytion.domain.user.enums.AuthExceptions.NOT_MATCHED_PASSWORD;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.NOT_MATCHED_PASSWORD;
 
 
 @Component
@@ -32,7 +32,7 @@ public class AccountAuthenticationProvider implements AuthenticationProvider {
     AccountDetails accountDetails = accountDetailsService.loadUserByUsername(email);
 
     if (!passwordEncoder.matches(password, accountDetails.getPassword())) {
-      throw new BadCredentialsException(NOT_MATCHED_PASSWORD.getMessage());
+      throw new BadCredentialsException(NOT_MATCHED_PASSWORD.getMessageList().getFirst());
     }
 
     return new AccountAuthenticationToken(accountDetails, accountDetails.getUsername(),

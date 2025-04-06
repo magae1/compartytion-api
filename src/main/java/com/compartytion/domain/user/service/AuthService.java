@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.compartytion.domain.model.ForgivenPassword;
 import com.compartytion.domain.model.UnauthenticatedEmail;
@@ -23,15 +22,14 @@ import com.compartytion.domain.user.mapper.AccountMapper;
 import com.compartytion.global.component.OTPGenerator;
 import com.compartytion.global.component.EmailSender;
 import com.compartytion.global.utils.PasswordValidator;
-import com.compartytion.global.exception.InvalidFormException;
 
-import static com.compartytion.domain.user.enums.AuthExceptions.ALREADY_VERIFIED_EMAIL;
-import static com.compartytion.domain.user.enums.AuthExceptions.DUPLICATED_EMAIL;
-import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_EMAIL;
-import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_FORGIVEN_PASSWORD;
-import static com.compartytion.domain.user.enums.AuthExceptions.NOT_FOUND_UNAUTHENTICATED_EMAIL;
-import static com.compartytion.domain.user.enums.AuthExceptions.NOT_VERIFIED_EMAIL;
-import static com.compartytion.domain.user.enums.AuthExceptions.WRONG_OTP;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.NOT_FOUND_EMAIL;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.ALREADY_VERIFIED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.DUPLICATED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.NOT_FOUND_FORGIVEN_PASSWORD;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.NOT_FOUND_UNAUTHENTICATED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.NOT_VERIFIED_EMAIL;
+import static com.compartytion.domain.user.enums.AuthFormExceptions.WRONG_OTP;
 
 
 @Log4j2
@@ -107,11 +105,12 @@ public class AuthService {
    *
    * @param email OTP를 수신할 이메일
    * @return {@link EmailOTPResponse}
-   * @throws ResponseStatusException OTP 전송 실패 시 발생
+   * @throws RuntimeException OTP 전송 실패 시 발생
    */
-  public EmailOTPResponse sendOTPForSignup(String email) throws ResponseStatusException {
+  public EmailOTPResponse sendOTPForSignup(String email) throws RuntimeException {
+    log.debug("email: {}", email);
     if (existsByEmail(email)) {
-      throw DUPLICATED_EMAIL.toResponseStatusException();
+      throw DUPLICATED_EMAIL.toInvalidFormException();
     }
     log.info("Email {} accepted!", email);
 
@@ -125,18 +124,18 @@ public class AuthService {
    * 회원가입을 위한 OTP 인증을 시도합니다.
    *
    * @param request {@link EmailOTPRequest}
-   * @throws ResponseStatusException OTP 인증 실패 시 발생
+   * @throws RuntimeException OTP 인증 실패 시 발생
    */
-  public void verifyOTPForSignup(EmailOTPRequest request) throws ResponseStatusException {
+  public void verifyOTPForSignup(EmailOTPRequest request) throws RuntimeException {
     UnauthenticatedEmail unauthenticatedEmail = unauthenticatedEmailRepo.findById(request.email())
-        .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toResponseStatusException);
+        .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toInvalidFormException);
 
     if (unauthenticatedEmail.isVerified()) {
-      throw ALREADY_VERIFIED_EMAIL.toResponseStatusException();
+      throw ALREADY_VERIFIED_EMAIL.toInvalidFormException();
     }
 
     if (!unauthenticatedEmail.getOtp().equals(request.otp())) {
-      throw WRONG_OTP.toResponseStatusException();
+      throw WRONG_OTP.toInvalidFormException();
     }
 
     updateUnauthenticatedEmailVerified(request.email());
@@ -147,11 +146,11 @@ public class AuthService {
    *
    * @param email OTP를 수신할 이메일
    * @return {@link EmailOTPResponse}
-   * @throws ResponseStatusException OTP 발송 실패 시 발생
+   * @throws RuntimeException OTP 발송 실패 시 발생
    */
-  public EmailOTPResponse sendOTPForChangePassword(String email) throws ResponseStatusException {
+  public EmailOTPResponse sendOTPForChangePassword(String email) throws RuntimeException {
     if (!existsByEmail(email)) {
-      throw NOT_FOUND_EMAIL.toResponseStatusException();
+      throw NOT_FOUND_EMAIL.toInvalidFormException();
     }
 
     String otp = otpGenerator.next();
@@ -164,18 +163,18 @@ public class AuthService {
    * 비밀번호 변경을 위한 OTP 인증을 시도합니다.
    *
    * @param request {@link EmailOTPRequest}
-   * @throws ResponseStatusException 인증 실패 시 발생
+   * @throws RuntimeException 인증 실패 시 발생
    */
-  public void verifyOTPForChangePassword(EmailOTPRequest request) throws ResponseStatusException {
+  public void verifyOTPForChangePassword(EmailOTPRequest request) throws RuntimeException {
     ForgivenPassword forgivenPassword = forgivenPasswordRepo.findById(request.email())
-        .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toResponseStatusException);
+        .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toInvalidFormException);
 
     if (forgivenPassword.isVerified()) {
-      throw ALREADY_VERIFIED_EMAIL.toResponseStatusException();
+      throw ALREADY_VERIFIED_EMAIL.toInvalidFormException();
     }
 
     if (!forgivenPassword.getOtp().equals(request.otp())) {
-      throw WRONG_OTP.toResponseStatusException();
+      throw WRONG_OTP.toInvalidFormException();
     }
 
     updateForgivenPasswordVerified(request.email());
@@ -186,21 +185,21 @@ public class AuthService {
    *
    * @param email   비밀번호를 변경하고자 하는 계정의 이메일
    * @param request {@link PasswordChangeRequest}
-   * @throws ResponseStatusException 비밀번호 변경 실패 시 발생
+   * @throws RuntimeException 비밀번호 변경 실패 시 발생
    */
   public void changePassword(String email, PasswordChangeRequest request)
-      throws ResponseStatusException {
+      throws RuntimeException {
     PasswordValidator.validate(request.password(), request.confirmedPassword());
 
     ForgivenPassword forgivenPassword = forgivenPasswordRepo.findById(email)
-        .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toResponseStatusException);
+        .orElseThrow(NOT_FOUND_FORGIVEN_PASSWORD::toInvalidFormException);
 
     if (!forgivenPassword.isVerified()) {
-      throw NOT_VERIFIED_EMAIL.toResponseStatusException();
+      throw NOT_VERIFIED_EMAIL.toInvalidFormException();
     }
 
     Account account = accountRepo.findByEmail(email)
-        .orElseThrow(NOT_FOUND_EMAIL::toResponseStatusException);
+        .orElseThrow(NOT_FOUND_EMAIL::toInvalidFormException);
     account.changePassword(request.password(), passwordEncoder);
     accountRepo.save(account);
   }
@@ -209,21 +208,21 @@ public class AuthService {
    * 회원가입을 시도합니다.
    *
    * @param request {@link SignUpRequest}
-   * @throws ResponseStatusException 회원가입 실패 시 발생
+   * @throws RuntimeException 회원가입 실패 시 발생
    */
-  public void signUp(SignUpRequest request) throws ResponseStatusException, InvalidFormException {
+  public void signUp(SignUpRequest request) throws RuntimeException {
     PasswordValidator.validate(request.password(), request.confirmedPassword());
 
     UnauthenticatedEmail unauthenticatedEmail = unauthenticatedEmailRepo.findById(request.email())
-        .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toResponseStatusException);
+        .orElseThrow(NOT_FOUND_UNAUTHENTICATED_EMAIL::toInvalidFormException);
 
     if (!unauthenticatedEmail.isVerified()) {
-      throw NOT_VERIFIED_EMAIL.toResponseStatusException();
+      throw NOT_VERIFIED_EMAIL.toInvalidFormException();
     }
 
     if (existsByEmail(request.email())) {
       unauthenticatedEmailRepo.deleteById(request.email());
-      throw DUPLICATED_EMAIL.toResponseStatusException();
+      throw DUPLICATED_EMAIL.toInvalidFormException();
     }
 
     log.info("Sign up with email {}", request.email());

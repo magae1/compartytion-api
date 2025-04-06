@@ -69,12 +69,12 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(InvalidFormException.class)
   public ResponseEntity<?> handleInvalidFormException(InvalidFormException e) {
     Map<String, Object> body = new LinkedHashMap<>(Map.of(
-        "code", HttpStatus.BAD_REQUEST.value()
+        "code", e.getStatus().value()
     ));
 
     body.put("message", e.getMessageMap());
 
-    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(body, e.getStatus());
   }
 
 }

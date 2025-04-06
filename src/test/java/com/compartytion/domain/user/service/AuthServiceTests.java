@@ -74,13 +74,13 @@ public class AuthServiceTests {
 
   @Test
   @DisplayName("특정 이메일을 가진 유저 정보가 있으면, 예외를 반환")
-  void givenAccount_whenSendOTPForSignup_thenThrowsResponseStatusException() throws Exception {
+  void givenAccount_whenSendOTPForSignup_thenThrowsRuntimeException() throws Exception {
     // Given
     String email = "test@example.com";
     when(accountRepo.existsByEmail(email)).thenReturn(true);
 
     // Then
-    assertThrows(ResponseStatusException.class, () -> {
+    assertThrows(RuntimeException.class, () -> {
       // When
       authService.sendOTPForSignup(email);
     });

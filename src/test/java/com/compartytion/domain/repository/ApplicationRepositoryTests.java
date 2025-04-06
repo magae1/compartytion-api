@@ -69,6 +69,7 @@ public class ApplicationRepositoryTests {
         .account(applicantAccount)
         .competition(competition)
         .name("applicant")
+        .email("apply@example.com")
         .identifier("abcdef")
         .build();
     applicationRepo.save(application);
@@ -76,6 +77,7 @@ public class ApplicationRepositoryTests {
         .account(participantAccount)
         .competition(competition)
         .index(0)
+        .email("participate@example.com")
         .name("participant")
         .identifier("basedf")
         .build();
